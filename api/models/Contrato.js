@@ -18,7 +18,7 @@ module.exports = {
     docVendedor: {
       type:'number'
     },
-    DocExpeVende: {
+    docExpeVende: {
       type:'string'
     },
     nombComprador: {
