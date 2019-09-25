@@ -6,61 +6,72 @@
  */
 
 module.exports = {
-
-  tableName:'variables',
+  tableName: "variables",
   attributes: {
-    tipoContrato:{
-      type:'string'
+    tipoContrato: {
+      type: "string",
+      required: true
     },
-    nombVendedor:{
-      type:'string'
+    nombVendedor: {
+      type: "string"
     },
     docVendedor: {
-      type:'number'
+      type: "number",
+      required: true
     },
     docExpeVende: {
-      type:'string'
+      type: "string"
     },
     nombComprador: {
-      type:'string'
+      type: "string"
     },
     docComprador: {
-      type:'number'
+      type: "number"
     },
     docExpeCompra: {
-      type:'string'
+      type: "string"
     },
     bien: {
-      type:'string'
+      type: "string"
     },
     dineroS: {
-      type:'string'
+      type: "string"
     },
     dineroN: {
-      type:'number'
+      type: "number"
     },
     descripValor: {
-      type:'string'
+      type: "string"
     },
-    tradicion: {
-      type:'string'
-    },
+    // tradicion: {
+    //   type: "string",
+    //   required:true
+    // },
     gastos: {
-      type:'string'
+      type: "string"
     },
     contratoCiudad: {
-      type:'string'
+      type: "string"
     },
     fechaContrato: {
-      type:'string'
+      type: "date"
     },
     tipoDocComp: {
-      type:'string'
+      type: "string"
     },
     tipoDocVend: {
-      type:'string'
+      type: "string"
     }
-  }, 
-  connection:'mongodb',
-};
+  },
 
+  //model validation messages definitions
+  validationMessages: {
+    //hand for i18n & l10n
+    tipoContrato: {
+      required: "Tipo de contrato is required"
+    },
+    docVendedor: {
+      required: "Documento del vendedors is required"
+    }
+  }
+};
