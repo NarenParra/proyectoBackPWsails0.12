@@ -16,8 +16,7 @@ module.exports = {
       type: "string"
     },
     docVendedor: {
-      type: "number",
-      required: true
+      type: "integer"
     },
     docExpeVende: {
       type: "string"
@@ -26,7 +25,7 @@ module.exports = {
       type: "string"
     },
     docComprador: {
-      type: "number"
+      type: "integer"
     },
     docExpeCompra: {
       type: "string"
@@ -38,7 +37,7 @@ module.exports = {
       type: "string"
     },
     dineroN: {
-      type: "number"
+      type: "integer"
     },
     descripValor: {
       type: "string"
@@ -63,15 +62,16 @@ module.exports = {
       type: "string"
     }
   },
+  connection: "mongodb",
 
   //model validation messages definitions
   validationMessages: {
     //hand for i18n & l10n
     tipoContrato: {
-      required: "Tipo de contrato is required"
+      required: "Tipo de contrato requerido",
     },
     docVendedor: {
-      required: "Documento del vendedors is required"
+      required: "Username is required"
     }
   }
 };

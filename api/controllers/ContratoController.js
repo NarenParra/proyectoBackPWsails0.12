@@ -34,6 +34,9 @@ module.exports = {
   },
   create: function(req, res) {
     sails.log.debug(req.allParams());
+    console.log(typeof req.param('dineroN'))
+    console.log(typeof req.param('docuVendedor'))
+    console.log(typeof req.param('docComprador'))
     Contrato.create(req.allParams())
       .then(function(variables) {
         return res.send({
