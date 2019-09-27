@@ -6,72 +6,52 @@
  */
 
 module.exports = {
-  tableName: "variables",
+  tableName: "contrato",
   attributes: {
-    tipoContrato: {
-      type: "string",
-      required: true
+    //contrato
+    estado:{
+      type:"estado"
     },
-    nombVendedor: {
-      type: "string"
+    articulo:{
+      type:"articulo"
     },
-    docVendedor: {
-      type: "integer"
+    numero:{
+      type:"string"
     },
-    docExpeVende: {
-      type: "string"
+    observaciones:{
+      type:"text"
     },
-    nombComprador: {
-      type: "string"
+    usuario:{
+      type:"usuario"
     },
-    docComprador: {
-      type: "integer"
+    creador:{
+      type:"usuario"
     },
-    docExpeCompra: {
-      type: "string"
+    contrato:{
+      type:"contrato"
     },
-    bien: {
-      type: "string"
+    finalidad:{
+      type:"string"
     },
-    dineroS: {
-      type: "string"
+    valor:{
+      type:"float"
     },
-    dineroN: {
-      type: "integer"
+    pagado:{
+      type:"float"
     },
-    descripValor: {
-      type: "string"
-    },
-    // tradicion: {
-    //   type: "string",
-    //   required:true
-    // },
-    gastos: {
-      type: "string"
-    },
-    contratoCiudad: {
-      type: "string"
-    },
-    fechaContrato: {
-      type: "date"
-    },
-    tipoDocComp: {
-      type: "string"
-    },
-    tipoDocVend: {
-      type: "string"
-    }
+    fechainica:"date",
+    fechatermina:"date"
   },
   connection: "mongodb",
 
   //model validation messages definitions
-  validationMessages: {
-    //hand for i18n & l10n
-    tipoContrato: {
-      required: "Tipo de contrato requerido",
-    },
-    docVendedor: {
-      required: "Username is required"
-    }
+  // validationMessages: {
+  //   //hand for i18n & l10n
+  //   tipoContrato: {
+  //     required: "Tipo de contrato requerido",
+  //   },
+  //   docVendedor: {
+  //     required: "Username is required"
+  //   }
   }
 };

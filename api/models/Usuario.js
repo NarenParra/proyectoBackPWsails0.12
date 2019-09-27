@@ -1,5 +1,5 @@
 /**
- * ContratoEtiqueta.js
+ * Usuario.js
  *
  * @description :: TODO: You might write a short summary of how this model works and what it represents here.
  * @docs        :: http://sailsjs.org/documentation/concepts/models-and-orm/models
@@ -7,26 +7,17 @@
 
 module.exports = {
   attributes: {
-    titulo: {
+    username: {
       type: "string"
     },
-    etiquetaDe: {
+    docid: {
       type: "string"
     },
-    descripcion: {
+    tipodocid: {
       type: "string"
     },
-    contrato: {
-      type: "contrato"
-    },
-    total: {
-      type: "float"
-    },
-    etiqueta: {
-      type: "etiqueta"
-    },
-    valor: {
-      type: "float"
+    tipopersona: {
+      type: "string"
     }
   }
 };
