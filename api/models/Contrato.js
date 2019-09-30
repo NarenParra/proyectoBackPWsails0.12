@@ -10,37 +10,37 @@ module.exports = {
   attributes: {
     //contrato
     estado:{
-      type:"estado"
-    },
-    articulo:{
-      type:"articulo"
-    },
-    numero:{
-      type:"string"
+      model:"estado"
     },
     observaciones:{
-      type:"text"
-    },
-    usuario:{
-      type:"usuario"
-    },
-    creador:{
-      type:"usuario"
-    },
-    contrato:{
-      type:"contrato"
-    },
-    finalidad:{
       type:"string"
     },
+    // usuario:{
+    //   type:"usuario"
+    // },
+    // creador:{
+    //   type:"usuario"
+    // },
+    // contrato:{
+    //   model:"contrato"
+    // },
+    // finalidad:{
+    //   type:"string"
+    // },
     valor:{
       type:"float"
     },
-    pagado:{
-      type:"float"
+    // pagado:{
+    //   type:"float"
+    // },
+    fechainicia:{
+      type:"date"
     },
-    fechainica:"date",
-    fechatermina:"date"
+    contratoCiudad:{
+      type:"string"
+    }
+
+    // fechatermina:"date"
   },
   connection: "mongodb",
 
@@ -53,5 +53,5 @@ module.exports = {
   //   docVendedor: {
   //     required: "Username is required"
   //   }
-  }
+  //}
 };

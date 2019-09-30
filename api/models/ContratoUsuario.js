@@ -11,13 +11,13 @@ module.exports = {
       type: "contrato"
     },
     usuario: {
-      type: "usuario"
+      model: "usuario"
     },
     rol: {
-      type: "rol"
+      model: "rol"
     },
     creador: {
-      type: "string"
+      model: "usuario"
     }
   }
 };

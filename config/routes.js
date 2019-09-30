@@ -46,6 +46,7 @@ module.exports.routes = {
   *                                                                          *
   ***************************************************************************/
   'GET /api/contrato' :'ContratoController.get',
-  'POST /api/contrato' : 'ContratoController.create'
+  'POST /api/contrato' : 'ContratoController.create',
+  'GET /api/test' :'TestController.get',
 
 };

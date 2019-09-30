@@ -6,13 +6,15 @@
  */
 
 module.exports = {
-  get: function(req, res) {
+
+  get: function (req, res) {
+        
     Contrato.find()
-      .then(function(variables) {
+      .then(function (variables) {
         if (!variables || variables.length == 0) {
           return res.send({
             success: false,
-            message: "No records fund"
+            message: "No records fund (contratos)"
           });
         }
         return res.send({
@@ -21,10 +23,10 @@ module.exports = {
           data: variables
         });
       })
-      .catch(function(err) {
+      .catch(function (err) {
         sails.log.debug(err);
         return (
-          res,
+          res.
           send({
             success: false,
             message: "Uneable fetch records"
@@ -32,23 +34,47 @@ module.exports = {
         );
       });
   },
-  create: function(req, res) {
+  create: function (req, res) {
     sails.log.debug(req.allParams());
-    Contrato.create(req.allParams())
-      .then(function(variables) {
-        return res.send({
-          success: true,
-          massage: "Creado Correctamente ",
-          data: variables
-        });
+
+    Estado.findOne({
+        titulo: req.param("estado")
       })
-      .catch(function(error) {
-        sails.log.debug(error.Errors);
-        if (error.invalidAttributes) {
-          return res.json(422, {
-            validationErrors: error.Errors
+      .then((estado) => {
+        var parametros = req.allParams();
+        sails.log.debug(parametros);
+        if (typeof estado == 'object') {
+          //sails.log.debug(req.param("titulo"), estado.id);
+          parametros.estado = estado.id;
+          sails.log.debug(parametros);
+          Contrato.create(parametros)
+            .then(function (coontrato) {
+              return res.send({
+                success: true,
+                massage: "Creado Correctamente "
+              });
+            })
+            .catch(err => {
+              return res.send({
+                success: false,
+                massage: "An Error in Register",
+                'err': err
+              });
+            })
+        } else {
+          return res.send({
+            success: true,
+            massage: "Estado no Founddd",
+            'err': err
           });
         }
+      })
+      .catch(err => {
+        return res.send({
+          success: true,
+          massage: "Estado no Found  ",
+          'err': err
+        });
       });
   }
 };
