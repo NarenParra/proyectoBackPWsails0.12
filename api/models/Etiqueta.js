@@ -8,9 +8,11 @@
 module.exports = {
 
   attributes: {
-    titulo:{
-      type:"string"
-  }
+    titulo: {
+      type: "string"
+    }
+  },
+  slug:{
+    type:"string"
   }
 };
-

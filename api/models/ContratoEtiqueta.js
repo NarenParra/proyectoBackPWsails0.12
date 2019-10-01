@@ -17,16 +17,19 @@ module.exports = {
       type: "string"
     },
     contrato: {
-      type: "contrato"
+      model: "contrato"
     },
     total: {
       type: "float"
     },
     etiqueta: {
-      type: "etiqueta"
+      model: "etiqueta"
     },
     valor: {
       type: "float"
+    },
+    contratoArticulo:{
+      model:"contratoarticulo"
     }
   }
 };

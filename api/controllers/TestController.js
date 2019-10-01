@@ -8,19 +8,27 @@
 module.exports = {
 
   get: function (req, res) {
-
-    var makeget = Servicio.mostrar(Rol);
-    res.send(makeget);
+     
+    //sails.log.debug(makeget);
+    Servicio.obtener(Rol)
+    .then(function (ff){
+      res.send(ff)
+    })
+    .catch(function (err) { return res.serverError(err); });
+      
   },
 
-//   index: function (req, res) {
+  create: function (req, res) {
 
-//     // Gets hello message from service
-//     var helloMessage = Servicio.sayHello('mensaje');
+  }
+  //   index: function (req, res) {
 
-//     // Returns hello message to screen
-//     res.send('Our service has a message for you: ' + helloMessage);
-//   }
+  //     // Gets hello message from service
+  //     var helloMessage = Servicio.sayHello('mensaje');
+
+  //     // Returns hello message to screen
+  //     res.send('Our service has a message for you: ' + helloMessage);
+  //   }
 
 
 };

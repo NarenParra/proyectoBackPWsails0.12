@@ -1,39 +1,66 @@
-var Servicio = {
+module.exports = {
 
-  async function name(model){
-    return new Promise(req,res)
-  }
-    
-
-
-  mostrar: function hagaalgo(Modelo) {
-
-    Modelo.find()
-      .then(function (variables) {
-        if (variables.length == 0) {
-          return res.send({
-            success: false,
-            message: "No records fund (contratos)"
+  // mostrar:  function funget(modelo) {
+  //    var ff= new Promise ((rej,res)=>{
+  //      modelo.find({})
+  //     .then(function (variables) {
+  //       if (variables.length == 0) {
+  //         res({
+  //           success: false,
+  //           message: "No records fund"
+  //         }); 
+  //       }
+  //        res({
+  //         success: true,
+  //         message: "Records fetched",
+  //         data: variables
+  //       });
+  //     })
+  //     .catch(function (err) {
+  //       sails.log.debug(err);
+  //        res({
+  //         success: false,
+  //         message: "Uneable fetch records"
+  //       });
+  //     });
+  //   })
+  //   return ff;
+  // }
+  obtener: function funget(modelo) {
+    var ff = new Promise((rej, res) => {
+      modelo.find()
+        .then(function (variables) {
+          if (!variables || variables.length == 0) {
+             rej({
+              success: false,
+              message: "No records fund (contratos)"
+            });
+          }
+           rej({
+            success: true,
+            message: "Records fetched",
+            data: variables
           });
-        }
-        return res.send({
-          success: true,
-          message: "Records fetched",
-          data: variables
+        })
+        .catch(function (err) {
+          sails.log.debug(err);
+           
+            rej({
+              success: false,
+              message: "Uneable fetch records"
+            })
         });
-      })
-      .catch(function (err) {
-        sails.log.debug(err);
-        return ({
-            success: false,
-            message: "Uneable fetch records"
-          })
-      });
+    });
+    return ff;
+  },
+
+  crear: function funcreate(){
+    var ff = new Promise((req,res)=>{
+      
+    });
+    return ff;
   }
   // sayHello: function sayHelloService(llegada) {
   //   return 'Hello I am servicio'+llegada;
   // }
 };
-
-
-module.exports = Servicio;
