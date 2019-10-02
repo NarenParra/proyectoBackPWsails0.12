@@ -7,8 +7,8 @@
 
 module.exports = {
   attributes: {
-    rticulo: {
-      type: "articulo"
+    articulo: {
+      model: "articulo"
     },
     cantidad: {
       type: "integer"
@@ -17,10 +17,14 @@ module.exports = {
       type: "float"
     },
     total: {
-      type: ""
+      type: "float"
     },
     entregado: {
-      type: "estado"
-    }
+      model: "estado"
+    },
+    contrato: {
+      model: "contrato"
+    },
+
   }
 };

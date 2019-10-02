@@ -8,7 +8,7 @@
 module.exports = {
   attributes: {
     contrato: {
-      type: "contrato"
+      moldel: "contrato"
     },
     usuario: {
       model: "usuario"
