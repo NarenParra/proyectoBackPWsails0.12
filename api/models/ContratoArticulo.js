@@ -13,7 +13,7 @@ module.exports = {
     cantidad: {
       type: "integer"
     },
-    precioventa: {
+    precioVenta: {
       type: "float"
     },
     total: {
@@ -25,6 +25,9 @@ module.exports = {
     contrato: {
       model: "contrato"
     },
+    contratoEtiqueta:{
+      model:"contratoetiqueta"
+    }
 
   }
 };

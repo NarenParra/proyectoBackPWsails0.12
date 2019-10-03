@@ -16,6 +16,9 @@ module.exports = {
     descripcion: {
       type: "string"
     },
+    valorDescripcion: {
+      type: "string"
+    },
     contrato: {
       model: "contrato"
     },
@@ -30,6 +33,9 @@ module.exports = {
     },
     contratoArticulo:{
       model:"contratoarticulo"
+    },
+    fecha:{
+      type:"date"
     }
   }
 };

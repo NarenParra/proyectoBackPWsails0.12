@@ -16,32 +16,8 @@ module.exports = {
       .catch(function (err) {
         return res.serverError(err);
       });
-
-    //  Contrato.find()
-    //    .then(function (variables) {
-    //      if (!variables || variables.length == 0) {
-    //        return res.send({
-    //          success: false,
-    //          message: "No records fund (contratos)"
-    //        });
-    //      }
-    //      return res.send({
-    //        success: true,
-    //        message: "Records fetched",
-    //        data: variables
-    //      });
-    //    })
-    //    .catch(function (err) {
-    //      sails.log.debug(err);
-    //      return (
-    //        res.
-    //        send({
-    //          success: false,
-    //          message: "Uneable fetch records"
-    //        })
-    //      );
-    //    });
   },
+
   create: function (req, res) {
 
     Estado.findOne({
@@ -51,45 +27,62 @@ module.exports = {
 
         if (typeof estado == 'object') {
           //sails.log.debug(req.param("titulo"), estado.id);
+          Usuario.findOne({
+            docid: req.param("usuario")
+          }).then((usuario) => {
+            sails.log.debug(usuario)
+            Contrato.create({
+                estado: estado.id,
+                observaciones: req.param('observaciones'),
+                valor: req.param('valor'),
+                fechainicia: req.param('fechainicia'),
+                contratoCiudad: req.param('contratoCiudad'),
+                usuario: usuario.id
+              })
+              .then(function (contrato) {
+                Servicio.crearContratoEtiqueta(req.param('slugObj'), contrato.id, 0, "", "", "")
+                  .then(function (fce) {
+                    Servicio.crearContratoArticulo(req.param('slugArt'), contrato.id, fce.id, contrato.valor)
+                      .then(function (fca) {
+                        //res.send(fca)
+                      })
 
-          Contrato.create({
-              estado: estado.id,
-              observaciones: req.param('observaciones'),
-              valor: req.param('valor'),
-              fechainicia: req.param('fechainicia'),
-              contratoCiudad: req.param('contratoCiudad')
-            })
-            .then(function (contrato) {
+                  }).catch(function (err) {
+                    return res.serverError(err);
+                  })
+                  .then(function (ff) {
+                    Servicio.crearContratoEtiqueta(req.param('slugPre'), contrato.id, contrato.valor, req.param('valorletra'), "", req.param('descripcion'))
+                      .then(function (fca) {
+                        // res.send(fca)
+                      })
 
-              Servicio.crearEtiquetaObjeto(req.param('slug'), contrato.id)
-                .then(function (ff) {
-                  
+                  }).then(function (ff) {
+                    Servicio.crearContratoEtiqueta(req.param('slugAcep'), contrato.id, 0, "", contrato.fechainicia, req.param('lugarContrato'))
+                      .then(function (fca) {
+                        res.send(fca)
+                      })
+                  })
 
-                }).catch(function (err) {
-                  return res.serverError(err);
-                })
-                // falta meter articulos, este se puede utilizar en otro
-                .then(function (ff) {
+                  .catch(function (err) {
+                    return res.serverError(err);
+                  })
 
-                  Servicio.crearContratoArticulo(req.param('slugArt'), contrato.id)
-                    .then(function (gg) {
-                      res.send(gg)
-                    })
-    
-                })
-                .catch(function (err) {
-                  return res.serverError(err);
-                })
+              })
+              .catch(err => {
+                return res.send({
+                  success: false,
+                  massage: "An Error in Register general",
+                  'err': err
+                });
+              })
 
-            })
-            .catch(err => {
-              return res.send({
-                success: false,
-                massage: "An Error in Register general",
-                'err': err
-              });
-            })
-
+          }).catch(err => {
+            return res.send({
+              success: true,
+              massage: "Usuario no Found ",
+              'err': err
+            });
+          })
         } else {
           return res.send({
             success: true,

@@ -1,5 +1,4 @@
 module.exports = {
-
   obtener: function funget(modelo) {
     var ff = new Promise((rej, res) => {
       modelo.find()
@@ -28,24 +27,23 @@ module.exports = {
     return ff;
   },
 
-  crearEtiquetaObjeto: function funcreate(parametros,contrato){
+
+  crearContratoEtiqueta: function funcreate(parametros,contrato,valor,valorletra,fechainicio,descripcion){
     var ff = new Promise((rej,res)=>{
-      sails.log.debug("parametros");
-      sails.log.debug(contrato);
+     
       Etiqueta.findOne({
         slug: parametros
       })
       .then((etiqueta) => {
         
         if (typeof etiqueta == 'object') {
-          //sails.log.debug(req.param("titulo"), estado.id)
-          ContratoEtiqueta.create({etiqueta:etiqueta.id,contrato})
-            .then(function (coontratoetiqueta) {
-              //falta meter articulos aca
-              sails.log.debug(coontratoetiqueta.id);
+          
+          ContratoEtiqueta.create({titulo:etiqueta.titulo,etiqueta:etiqueta.id,contrato:contrato,valor:valor,valorDescripcion:valorletra,fecha:fechainicio,descripcion:descripcion})
+            .then(function (contratoetiqueta) {
               return rej({
                 success: true,
-                massage: "Creado Correctamente "
+                massage: "Creado Correctamente ",
+                id:contratoetiqueta.id
               });
             })
             .catch(err => {
@@ -74,10 +72,52 @@ module.exports = {
     return ff;
   },
 
-  crearContratoArticulo: function funcreate(parametros,contrato){
+  crearContratoUsuario: function funcreate(parametros,contrato,fechainicio,descripcion){
+
     var ff = new Promise((rej,res)=>{
-      sails.log.debug("parametros");
-      sails.log.debug(parametros);
+     
+      ROL.findOne({
+        slug: parametros
+      })
+      .then((etiqueta) => {
+        
+        if (typeof etiqueta == 'object') {
+          
+          ContratoUsuario.create({titulo:etiqueta.titulo,etiqueta:etiqueta.id,contrato:contrato,fecha:fechainicio,descripcion:descripcion})
+            .then(function (contratoetiquetaprecio) {
+              return rej({
+                success: true,
+                massage: "Creado Correctamente ",
+              });
+            })
+            .catch(err => {
+              return rej({
+                success: false,
+                massage: "An Error in Register",
+                'err': err
+              });
+            })
+        } else {
+          return rej({
+            success: true,
+            massage: "Estado no Founddd",
+            'err': err
+          });
+        }
+      })
+      .catch(err => {
+        return rej({
+          success: true,
+          massage: "Etiqueta no Found  ",
+          'err': err
+        });
+      });
+    });
+    return ff;
+  },
+
+  crearContratoArticulo: function funcreate(parametros,contrato,etiqueta,valor){
+    var ff = new Promise((rej,res)=>{
       Articulo.findOne({
         slug: parametros
       })
@@ -85,12 +125,12 @@ module.exports = {
         
         if (typeof articulo == 'object') {
           //sails.log.debug(req.param("titulo"), estado.id)
-          sails.log.debug(articulo.id);
-          ContratoArticulo.create({articulo:articulo.id,contrato})
-            .then(function (coontratoetiqueta) {
+          ContratoArticulo.create({articulo:articulo.id,contrato:contrato,contratoEtiqueta:etiqueta, precioVenta:valor})
+            .then(function (contratoArticulo) {
               return rej({
                 success: true,
-                massage: "Creado Correctamente "
+                massage: "Creado Correctamente ",
+                id:""
               });
             })
             .catch(err => {
