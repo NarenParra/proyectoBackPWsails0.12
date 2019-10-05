@@ -21,75 +21,102 @@ module.exports = {
   create: function (req, res) {
 
     Estado.findOne({
-        titulo: req.param("estado")
+        slug: req.param("estado")
       })
       .then((estado) => {
 
-        if (typeof estado == 'object') {
-          //sails.log.debug(req.param("titulo"), estado.id);
-          Usuario.findOne({
-            docid: req.param("usuario")
-          }).then((usuario) => {
-            sails.log.debug(usuario)
-            Contrato.create({
-                estado: estado.id,
-                observaciones: req.param('observaciones'),
-                valor: req.param('valor'),
-                fechainicia: req.param('fechainicia'),
-                contratoCiudad: req.param('contratoCiudad'),
-                usuario: usuario.id
-              })
-              .then(function (contrato) {
-                Servicio.crearContratoEtiqueta(req.param('slugObj'), contrato.id, 0, "", "", "")
-                  .then(function (fce) {
-                    Servicio.crearContratoArticulo(req.param('slugArt'), contrato.id, fce.id, contrato.valor)
-                      .then(function (fca) {
-                        //res.send(fca)
+     // sails.log.debug(req.param("userlog"));
+        Usuario.findOne({
+          docid: req.param("userlog")
+        }).then((usuariolog) => {
+
+          // Usuario.findOne({
+          //     docid: req.param("usercomp")
+          //   }).then((usuariocom) => {
+
+
+              Contrato.create({
+                  estado: estado.id,
+                  observaciones: req.param('observaciones'),
+                  valor: req.param('valor'),
+                  fechainicia: req.param('fechainicia'),
+                  contratoCiudad: req.param('contratoCiudad'),
+                  //usuario: usuariocom,
+                  creador: usuariolog.id
+                })
+                .then(function (contrato) {
+
+                  Servicio.crearContratoEtiqueta(req.param('slugObj'), contrato.id, 0, "", "", "")
+                    .then(function (fce) {
+                      Servicio.crearContratoArticulo(req.param('slugArt'), contrato.id, fce.id, contrato.valor)
+                        .then(function (fca) {})
+                    })
+
+                    .then(function (ff) {
+                      Servicio.crearContratoEtiqueta(req.param('slugPre'), contrato.id, contrato.valor, req.param('valorletra'), "", req.param('descripcion'))
+                        .then(function (fce) {})
+
+                    }).then(function (ff) {
+                      Servicio.crearContratoEtiqueta(req.param('slugAcep'), contrato.id, 0, "", contrato.fechainicia, req.param('lugarContrato'))
+                        .then(function (fcac) {
+                           //res.send(fcac)
+                        })
+                    })
+                    // .then(function (ff) {
+
+                    //   Servicio.crearContratoUsuario(usuariocom, contrato.id, "comprador")
+                    //     .then(function (fce) {
+                    //       //res.send(fce)
+                    //     })
+                    // })
+                    .then(function (ff) {
+                      Usuario.findOne({
+                        docid: req.param("uservend")
+                      }).then((usuariovend) => {
+                       //sails.log.debug(usuariovend)
+
+                          Servicio.crearContratoUsuario(usuariovend, contrato.id, "vendedor")
+                          .then(function (fce) {
+                         // sails.log.debug(res.send(fce))
+                            res.send(fce)
+                          })
+                  
                       })
-
-                  }).catch(function (err) {
-                    return res.serverError(err);
-                  })
-                  .then(function (ff) {
-                    Servicio.crearContratoEtiqueta(req.param('slugPre'), contrato.id, contrato.valor, req.param('valorletra'), "", req.param('descripcion'))
-                      .then(function (fca) {
-                        // res.send(fca)
-                      })
-
-                  }).then(function (ff) {
-                    Servicio.crearContratoEtiqueta(req.param('slugAcep'), contrato.id, 0, "", contrato.fechainicia, req.param('lugarContrato'))
-                      .then(function (fca) {
-                        res.send(fca)
-                      })
-                  })
-
-                  .catch(function (err) {
-                    return res.serverError(err);
-                  })
-
-              })
-              .catch(err => {
-                return res.send({
-                  success: false,
-                  massage: "An Error in Register general",
-                  'err': err
-                });
-              })
-
-          }).catch(err => {
-            return res.send({
-              success: true,
-              massage: "Usuario no Found ",
-              'err': err
-            });
-          })
-        } else {
+                    })
+                    .catch(function (err) {
+                      return res.send(err);
+                    })
+                })
+                .catch(err => {
+                  return res.send({
+                    success: false,
+                    massage: "An Error in Register general",
+                    'err': err
+                  });
+                })
+              // })
+              // .catch(err => {
+              //   return res.send({
+              //     success: false,
+              //     massage: "usuario vendedor no Found  ",
+              //     'err': err
+              //   });
+              // })
+            // })
+            // .catch(err => {
+            //   return res.send({
+            //     success: true,
+            //     massage: "usuario comprador no Found  ",
+            //     'err': err
+            //   });
+            // })
+        }).catch(err => {
           return res.send({
             success: true,
-            massage: "Estado no Foundd",
+            massage: "Usuariolog no Found ",
             'err': err
           });
-        }
+        })
       })
       .catch(err => {
         return res.send({

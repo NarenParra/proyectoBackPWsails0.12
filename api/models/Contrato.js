@@ -9,35 +9,35 @@ module.exports = {
   tableName: "contrato",
   attributes: {
     //contrato
-    estado:{
-      model:"estado"
+    estado: {
+      model: "estado"
     },
-    observaciones:{
-      type:"string"
+    observaciones: {
+      type: "string"
     },
-    // usuario:{
-    //   type:"usuario"
-    // },
-    // creador:{
-    //   type:"usuario"
-    // },
+    usuario: {
+      model: "usuario"
+    },
+    creador: {
+      model: "usuario"
+    },
     // contrato:{
     //   model:"contrato"
     // },
     // finalidad:{
     //   type:"string"
     // },
-    valor:{
-      type:"float"
+    valor: {
+      type: "float"
     },
     // pagado:{
     //   type:"float"
     // },
-    fechainicia:{
-      type:"date"
+    fechainicia: {
+      type: "date"
     },
-    contratoCiudad:{
-      type:"string"
+    contratoCiudad: {
+      type: "string"
     }
 
     // fechatermina:"date"

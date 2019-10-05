@@ -4,46 +4,52 @@ module.exports = {
       modelo.find()
         .then(function (variables) {
           if (!variables || variables.length == 0) {
-             rej({
+            rej({
               success: false,
-              message: "No records fund (contratos)"
+              massage: "No records fund (contratos)"
             });
           }
-           rej({
+          rej({
             success: true,
-            message: "Records fetched",
+            massage: "Records fetched",
             data: variables
           });
         })
         .catch(function (err) {
           sails.log.debug(err);
-           
-            rej({
-              success: false,
-              message: "Uneable fetch records"
-            })
+
+          rej({
+            success: false,
+            massage: "Uneable fetch records"
+          })
         });
     });
     return ff;
   },
 
 
-  crearContratoEtiqueta: function funcreate(parametros,contrato,valor,valorletra,fechainicio,descripcion){
-    var ff = new Promise((rej,res)=>{
-     
+  crearContratoEtiqueta: function funcreate(parametros, contrato, valor, valorletra, fechainicio, descripcion) {
+    var ff = new Promise((rej, res) => {
+
       Etiqueta.findOne({
-        slug: parametros
-      })
-      .then((etiqueta) => {
-        
-        if (typeof etiqueta == 'object') {
-          
-          ContratoEtiqueta.create({titulo:etiqueta.titulo,etiqueta:etiqueta.id,contrato:contrato,valor:valor,valorDescripcion:valorletra,fecha:fechainicio,descripcion:descripcion})
+          slug: parametros
+        })
+        .then((etiqueta) => {
+
+          ContratoEtiqueta.create({
+              titulo: etiqueta.titulo,
+              etiqueta: etiqueta.id,
+              contrato: contrato,
+              valor: valor,
+              valorDescripcion: valorletra,
+              fecha: fechainicio,
+              descripcion: descripcion
+            })
             .then(function (contratoetiqueta) {
               return rej({
                 success: true,
                 massage: "Creado Correctamente ",
-                id:contratoetiqueta.id
+                id: contratoetiqueta.id
               });
             })
             .catch(err => {
@@ -53,38 +59,33 @@ module.exports = {
                 'err': err
               });
             })
-        } else {
+        })
+        .catch(err => {
           return rej({
             success: true,
-            massage: "Estado no Founddd",
+            massage: "Etiqueta no Found  ",
             'err': err
           });
-        }
-      })
-      .catch(err => {
-        return rej({
-          success: true,
-          massage: "Etiqueta no Found  ",
-          'err': err
         });
-      });
     });
     return ff;
   },
 
-  crearContratoUsuario: function funcreate(parametros,contrato,fechainicio,descripcion){
+  crearContratoUsuario: function funcreate(usuario, contrato, rol) {
 
-    var ff = new Promise((rej,res)=>{
-     
-      ROL.findOne({
-        slug: parametros
-      })
-      .then((etiqueta) => {
-        
-        if (typeof etiqueta == 'object') {
+    var ff = new Promise((rej, res) => {
+      
+      Rol.findOne({
+          slug: rol
+        })
+        .then((rolb) => {
           
-          ContratoUsuario.create({titulo:etiqueta.titulo,etiqueta:etiqueta.id,contrato:contrato,fecha:fechainicio,descripcion:descripcion})
-            .then(function (contratoetiquetaprecio) {
+          ContratoUsuario.create({
+              contrato: contrato,
+              usuario: usuario.id,
+              rol: rolb.id
+            })
+            .then(function (contratoUsuario) {
               return rej({
                 success: true,
                 massage: "Creado Correctamente ",
@@ -97,40 +98,37 @@ module.exports = {
                 'err': err
               });
             })
-        } else {
+        })
+        .catch(err => {
           return rej({
             success: true,
-            massage: "Estado no Founddd",
+            massage: "Rol no Found  ",
             'err': err
           });
-        }
-      })
-      .catch(err => {
-        return rej({
-          success: true,
-          massage: "Etiqueta no Found  ",
-          'err': err
         });
-      });
     });
     return ff;
   },
 
-  crearContratoArticulo: function funcreate(parametros,contrato,etiqueta,valor){
-    var ff = new Promise((rej,res)=>{
+  crearContratoArticulo: function funcreate(parametros, contrato, etiqueta, valor) {
+    var ff = new Promise((rej, res) => {
       Articulo.findOne({
-        slug: parametros
-      })
-      .then((articulo) => {
-        
-        if (typeof articulo == 'object') {
+          slug: parametros
+        })
+        .then((articulo) => {
+
           //sails.log.debug(req.param("titulo"), estado.id)
-          ContratoArticulo.create({articulo:articulo.id,contrato:contrato,contratoEtiqueta:etiqueta, precioVenta:valor})
+          ContratoArticulo.create({
+              articulo: articulo.id,
+              contrato: contrato,
+              contratoEtiqueta: etiqueta,
+              precioVenta: valor
+            })
             .then(function (contratoArticulo) {
               return rej({
                 success: true,
                 massage: "Creado Correctamente ",
-                id:""
+                id: ""
               });
             })
             .catch(err => {
@@ -140,21 +138,14 @@ module.exports = {
                 'err': err
               });
             })
-        } else {
+        })
+        .catch(err => {
           return rej({
             success: true,
-            massage: "Estado no Founddd",
+            massage: "Articulo no Found  ",
             'err': err
           });
-        }
-      })
-      .catch(err => {
-        return rej({
-          success: true,
-          massage: "Etiqueta no Found  ",
-          'err': err
         });
-      });
     });
     return ff;
   }
