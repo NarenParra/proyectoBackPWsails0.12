@@ -30,10 +30,15 @@ module.exports = {
           docid: req.param("userlog")
         }).then((usuariolog) => {
 
-          // Usuario.findOne({
-          //     docid: req.param("usercomp")
-          //   }).then((usuariocom) => {
+           Usuario.findOne({
+               docid: req.param("usercomp")
+             }).then((usuariocom) => {
 
+              var idusercom = null;
+              var valorv = null;
+              if(typeof usuariocom =='object' && estado.slug=='borrador'){
+                idusercom =usuariocom.id
+              }
 
               Contrato.create({
                   estado: estado.id,
@@ -41,7 +46,7 @@ module.exports = {
                   valor: req.param('valor'),
                   fechainicia: req.param('fechainicia'),
                   contratoCiudad: req.param('contratoCiudad'),
-                  //usuario: usuariocom,
+                  usuario: idusercom,
                   creador: usuariolog.id
                 })
                 .then(function (contrato) {
@@ -62,13 +67,13 @@ module.exports = {
                            //res.send(fcac)
                         })
                     })
-                    // .then(function (ff) {
-
-                    //   Servicio.crearContratoUsuario(usuariocom, contrato.id, "comprador")
-                    //     .then(function (fce) {
-                    //       //res.send(fce)
-                    //     })
-                    // })
+                     .then(function (ff) {
+                      
+                       Servicio.crearContratoUsuario(usuariocom, contrato.id, "comprador")
+                        .then(function (fce) {
+                           //res.send(fce)
+                         })
+                     })
                     .then(function (ff) {
                       Usuario.findOne({
                         docid: req.param("uservend")
@@ -102,14 +107,14 @@ module.exports = {
               //     'err': err
               //   });
               // })
-            // })
-            // .catch(err => {
-            //   return res.send({
-            //     success: true,
-            //     massage: "usuario comprador no Found  ",
-            //     'err': err
-            //   });
-            // })
+             })
+             .catch(err => {
+               return res.send({
+                 success: true,
+                 massage: "usuario comprador no Found  ",
+                 'err': err
+               });
+             })
         }).catch(err => {
           return res.send({
             success: true,

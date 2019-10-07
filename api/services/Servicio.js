@@ -6,7 +6,7 @@ module.exports = {
           if (!variables || variables.length == 0) {
             rej({
               success: false,
-              massage: "No records fund (contratos)"
+              massage: "No records fund "
             });
           }
           rej({
@@ -17,7 +17,6 @@ module.exports = {
         })
         .catch(function (err) {
           sails.log.debug(err);
-
           rej({
             success: false,
             massage: "Uneable fetch records"
@@ -74,7 +73,11 @@ module.exports = {
   crearContratoUsuario: function funcreate(usuario, contrato, rol) {
 
     var ff = new Promise((rej, res) => {
-      
+      var iduser= null
+      if(typeof usuario == 'object'){
+      var iduser=usuario.id
+      }
+
       Rol.findOne({
           slug: rol
         })
@@ -82,7 +85,7 @@ module.exports = {
           
           ContratoUsuario.create({
               contrato: contrato,
-              usuario: usuario.id,
+              usuario: iduser,
               rol: rolb.id
             })
             .then(function (contratoUsuario) {
@@ -116,10 +119,13 @@ module.exports = {
           slug: parametros
         })
         .then((articulo) => {
-
+          var idart = null
           //sails.log.debug(req.param("titulo"), estado.id)
+          if(typeof articulo == 'object'){
+            idart=articulo.id
+          }
           ContratoArticulo.create({
-              articulo: articulo.id,
+              articulo: idart,
               contrato: contrato,
               contratoEtiqueta: etiqueta,
               precioVenta: valor
