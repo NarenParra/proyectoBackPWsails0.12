@@ -47,7 +47,8 @@ module.exports = {
                   fechainicia: req.param('fechainicia'),
                   contratoCiudad: req.param('contratoCiudad'),
                   usuario: idusercom,
-                  creador: usuariolog.id
+                  creador: usuariolog.id,
+                  finalidad:req.param('finalidad')
                 })
                 .then(function (contrato) {
 

@@ -24,9 +24,9 @@ module.exports = {
     // contrato:{
     //   model:"contrato"
     // },
-    // finalidad:{
-    //   type:"string"
-    // },
+   finalidad:{
+     type:"string"
+   },
     valor: {
       type: "float"
     },
