@@ -6,6 +6,18 @@
  */
 
 module.exports = {
+
+  get: function (req, res) {
+
+    Servicio.obtenerP(ContratoEtiqueta,req.param('idc'))
+      .then(function (ff) {
+        res.send(ff)
+      })
+      .catch(function (err) {
+        return res.serverError(err);
+      });
+  },
+
 	create: function (req, res) {
         sails.log.debug(req.allParams());
     

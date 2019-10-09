@@ -26,6 +26,63 @@ module.exports = {
     return ff;
   },
 
+  obtenerP: function funget(modelo,idc) {
+    var ff = new Promise((rej, res) => {
+      modelo.find(
+        {where:{contrato:idc}}
+      )
+        .then(function (variables) {
+          if (!variables || variables.length == 0) {
+            rej({
+              success: false,
+              massage: "No records fund "
+            });
+          }
+          rej({
+            success: true,
+            massage: "Records fetched",
+            data: variables
+          });
+        })
+        .catch(function (err) {
+          sails.log.debug(err);
+          rej({
+            success: false,
+            massage: "Uneable fetch records"
+          })
+        });
+    });
+    return ff;
+  },
+
+  obtenerUoR: function funget(modelo,idc) {
+    var ff = new Promise((rej, res) => {
+      modelo.find(
+        {where:{id:idc}}
+      )
+        .then(function (variables) {
+          if (!variables || variables.length == 0) {
+            rej({
+              success: false,
+              massage: "No records fund "
+            });
+          }
+          rej({
+            success: true,
+            massage: "Records fetched",
+            data: variables
+          });
+        })
+        .catch(function (err) {
+          sails.log.debug(err);
+          rej({
+            success: false,
+            massage: "Uneable fetch records"
+          })
+        });
+    });
+    return ff;
+  },
 
   crearContratoEtiqueta: function funcreate(parametros, contrato, valor, valorletra, fechainicio, descripcion) {
     var ff = new Promise((rej, res) => {
