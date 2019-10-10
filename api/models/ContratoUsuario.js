@@ -18,6 +18,11 @@ module.exports = {
     },
     creador: {
       model: "usuario"
+    },
+    /// valor momentaneo a falta de aser etiqueta lugar almacena el lugar de expedicion del documento del usuario
+    descripcion:{
+      type:"string"
     }
   }
+  
 };

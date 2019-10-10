@@ -12,6 +12,7 @@ module.exports = {
     Servicio.obtener(Contrato)
       .then(function (ff) {
         res.send(ff)
+        //sails.log.debug(ff)
       })
       .catch(function (err) {
         return res.serverError(err);
@@ -70,7 +71,7 @@ module.exports = {
                     })
                      .then(function (ff) {
                       
-                       Servicio.crearContratoUsuario(usuariocom, contrato.id, "comprador")
+                       Servicio.crearContratoUsuario(usuariocom, contrato.id, "comprador",req.param("docExpeCompra"))
                         .then(function (fce) {
                            //res.send(fce)
                          })
@@ -81,7 +82,7 @@ module.exports = {
                       }).then((usuariovend) => {
                        //sails.log.debug(usuariovend)
 
-                          Servicio.crearContratoUsuario(usuariovend, contrato.id, "vendedor")
+                          Servicio.crearContratoUsuario(usuariovend, contrato.id, "vendedor",req.param("docExpeVende"))
                           .then(function (fce) {
                          // sails.log.debug(res.send(fce))
                             res.send(fce)
@@ -100,14 +101,7 @@ module.exports = {
                     'err': err
                   });
                 })
-              // })
-              // .catch(err => {
-              //   return res.send({
-              //     success: false,
-              //     massage: "usuario vendedor no Found  ",
-              //     'err': err
-              //   });
-              // })
+  
              })
              .catch(err => {
                return res.send({

@@ -8,7 +8,7 @@
 module.exports = {
 	get: function (req, res) {
 
-        Servicio.obtenerUoR(ContratoUsuario,req.param('idc'))
+        Servicio.obtenerCA(ContratoArticulo,req.param('idc'))
           .then(function (ff) {
             res.send(ff)
           })

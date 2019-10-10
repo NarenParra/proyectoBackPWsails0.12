@@ -26,11 +26,53 @@ module.exports = {
     return ff;
   },
 
-  obtenerP: function funget(modelo,idc) {
+  obtenerC: function funget(modelo) {
     var ff = new Promise((rej, res) => {
-      modelo.find(
-        {where:{contrato:idc}}
-      )
+      modelo.find()
+        .then(function (variables) {
+          if (!variables || variables.length == 0) {
+            rej({
+              success: false,
+              massage: "No records fund "
+            });
+          } else {
+            variables.forEach(element => {
+              Estado.find({
+                where: {
+                  id: element.estado
+                }
+              }).then(function (datos) {
+                sails.log(variables.estado)
+                variables.estado=datos.titulo;
+                rej({
+                  success: true,
+                  massage: "Records fetched",
+                  data: element
+                });
+              })
+            });
+            
+          }
+          
+        })
+        .catch(function (err) {
+          sails.log.debug(err);
+          rej({
+            success: false,
+            massage: "Uneable fetch records"
+          })
+        });
+    });
+    return ff;
+  },
+
+  obtenerP: function funget(modelo, idc) {
+    var ff = new Promise((rej, res) => {
+      modelo.find({
+          where: {
+            contrato: idc
+          }
+        })
         .then(function (variables) {
           if (!variables || variables.length == 0) {
             rej({
@@ -55,11 +97,13 @@ module.exports = {
     return ff;
   },
 
-  obtenerUoR: function funget(modelo,idc) {
+  obtenerUoR: function funget(modelo, idc) {
     var ff = new Promise((rej, res) => {
-      modelo.find(
-        {where:{id:idc}}
-      )
+      modelo.find({
+          where: {
+            id: idc
+          }
+        })
         .then(function (variables) {
           if (!variables || variables.length == 0) {
             rej({
@@ -72,6 +116,52 @@ module.exports = {
             massage: "Records fetched",
             data: variables
           });
+        })
+        .catch(function (err) {
+          sails.log.debug(err);
+          rej({
+            success: false,
+            massage: "Uneable fetch records"
+          })
+        });
+    });
+    return ff;
+  },
+  obtenerCA: function funget(modelo, idc) {
+    var ff = new Promise((rej, res) => {
+      modelo.find({
+          where: {
+            contratoEtiqueta: idc
+          }
+        })
+        .then(function (variables) {
+          if (!variables || variables.length == 0) {
+            rej({
+              success: false,
+              massage: "No records fund "
+            });
+          } else {
+            Articulo.find({
+                where: {
+                  id: variables[0].articulo
+                }
+              })
+              .then(function (elements) {
+                rej({
+                  success: true,
+                  massage: "Records fetched",
+                  data: elements
+                });
+
+              }).catch(function (err) {
+                sails.log.debug(err);
+                rej({
+                  success: false,
+                  massage: "Uneable fetch records"
+                })
+              });
+          }
+
         })
         .catch(function (err) {
           sails.log.debug(err);
@@ -127,23 +217,24 @@ module.exports = {
     return ff;
   },
 
-  crearContratoUsuario: function funcreate(usuario, contrato, rol) {
+  crearContratoUsuario: function funcreate(usuario, contrato, rol, descripcion) {
 
     var ff = new Promise((rej, res) => {
-      var iduser= null
-      if(typeof usuario == 'object'){
-      var iduser=usuario.id
+      var iduser = null
+      if (typeof usuario == 'object') {
+        var iduser = usuario.id
       }
 
       Rol.findOne({
           slug: rol
         })
         .then((rolb) => {
-          
+
           ContratoUsuario.create({
               contrato: contrato,
               usuario: iduser,
-              rol: rolb.id
+              rol: rolb.id,
+              descripcion: descripcion
             })
             .then(function (contratoUsuario) {
               return rej({
@@ -178,8 +269,8 @@ module.exports = {
         .then((articulo) => {
           var idart = null
           //sails.log.debug(req.param("titulo"), estado.id)
-          if(typeof articulo == 'object'){
-            idart=articulo.id
+          if (typeof articulo == 'object') {
+            idart = articulo.id
           }
           ContratoArticulo.create({
               articulo: idart,
