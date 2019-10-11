@@ -26,19 +26,19 @@ module.exports = {
       })
       .then((estado) => {
 
-     // sails.log.debug(req.param("userlog"));
+        // sails.log.debug(req.param("userlog"));
         Usuario.findOne({
           docid: req.param("userlog")
         }).then((usuariolog) => {
 
-           Usuario.findOne({
-               docid: req.param("usercomp")
-             }).then((usuariocom) => {
+          Usuario.findOne({
+              docid: req.param("usercomp")
+            }).then((usuariocom) => {
 
               var idusercom = null;
               var valorv = null;
-              if(typeof usuariocom =='object' && estado.slug=='borrador'){
-                idusercom =usuariocom.id
+              if (typeof usuariocom == 'object' && estado.slug == 'borrador') {
+                idusercom = usuariocom.id
               }
 
               Contrato.create({
@@ -49,7 +49,7 @@ module.exports = {
                   contratoCiudad: req.param('contratoCiudad'),
                   usuario: idusercom,
                   creador: usuariolog.id,
-                  finalidad:req.param('finalidad')
+                  finalidad: req.param('finalidad')
                 })
                 .then(function (contrato) {
 
@@ -66,28 +66,28 @@ module.exports = {
                     }).then(function (ff) {
                       Servicio.crearContratoEtiqueta(req.param('slugAcep'), contrato.id, 0, "", contrato.fechainicia, req.param('lugarContrato'))
                         .then(function (fcac) {
-                           //res.send(fcac)
+                          //res.send(fcac)
                         })
                     })
-                     .then(function (ff) {
-                      
-                       Servicio.crearContratoUsuario(usuariocom, contrato.id, "comprador",req.param("docExpeCompra"))
+                    .then(function (ff) {
+
+                      Servicio.crearContratoUsuario(usuariocom, contrato.id, "comprador", req.param("docExpeCompra"))
                         .then(function (fce) {
-                           //res.send(fce)
-                         })
-                     })
+                          //res.send(fce)
+                        })
+                    })
                     .then(function (ff) {
                       Usuario.findOne({
                         docid: req.param("uservend")
                       }).then((usuariovend) => {
-                       //sails.log.debug(usuariovend)
+                        //sails.log.debug(usuariovend)
 
-                          Servicio.crearContratoUsuario(usuariovend, contrato.id, "vendedor",req.param("docExpeVende"))
+                        Servicio.crearContratoUsuario(usuariovend, contrato.id, "vendedor", req.param("docExpeVende"))
                           .then(function (fce) {
-                         // sails.log.debug(res.send(fce))
+                            // sails.log.debug(res.send(fce))
                             res.send(fce)
                           })
-                  
+
                       })
                     })
                     .catch(function (err) {
@@ -101,18 +101,18 @@ module.exports = {
                     'err': err
                   });
                 })
-  
-             })
-             .catch(err => {
-               return res.send({
-                 success: true,
-                 massage: "usuario comprador no Found  ",
-                 'err': err
-               });
-             })
+
+            })
+            .catch(err => {
+              return res.send({
+                success: false,
+                massage: "usuario comprador no Found  ",
+                'err': err
+              });
+            })
         }).catch(err => {
           return res.send({
-            success: true,
+            success: false,
             massage: "Usuariolog no Found ",
             'err': err
           });
@@ -120,10 +120,53 @@ module.exports = {
       })
       .catch(err => {
         return res.send({
-          success: true,
+          success: false,
           massage: "Estado no Found  ",
           'err': err
         });
       })
-  }
+  },
+
+  update: function (req, res) {
+    sails.log.debug('entra update')
+    Estado.findOne({
+        slug: req.param("estado")
+      })
+      .then((estado) => {
+    sails.log.debug(estado.id)
+    sails.log.debug(req.param('id'))
+        Contrato.update(req.param('id'), {
+            estado: estado.id,
+            observaciones: req.param('observaciones'),
+            valor: req.param('valor'),
+            fechainicia: req.param('fechainicia'),
+            contratoCiudad: req.param('contratoCiudad'),
+            //usuario: idusercom,
+            //creador: usuariolog.id,
+            finalidad: req.param('finalidad')
+          })
+          .then(function (contrato) {
+            return res.send({
+              'success': true,
+              'massage': "Record Upadte",
+              "data": contrato
+            })
+          })
+          .catch(err => {
+            return res.send({
+              success: true,
+              massage: "contrato no Found  ",
+              'err': err
+            });
+          })
+      })
+      .catch(err => {
+        return res.send({
+          success: false,
+          massage: "Estado no Found  ",
+          'err': err
+        });
+      })
+
+  },
 };
