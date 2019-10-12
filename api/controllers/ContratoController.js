@@ -128,13 +128,15 @@ module.exports = {
   },
 
   update: function (req, res) {
-    sails.log.debug('entra update')
     Estado.findOne({
         slug: req.param("estado")
       })
       .then((estado) => {
-    sails.log.debug(estado.id)
-    sails.log.debug(req.param('id'))
+        sails.log.debug(estado.id)
+
+        // sails.log.debug(req.param('id'))
+
+
         Contrato.update(req.param('id'), {
             estado: estado.id,
             observaciones: req.param('observaciones'),
@@ -142,10 +144,85 @@ module.exports = {
             fechainicia: req.param('fechainicia'),
             contratoCiudad: req.param('contratoCiudad'),
             //usuario: idusercom,
-            //creador: usuariolog.id,
+            //debe ser tomado del usuario logueado
+            creador: "5d96535058699210f8bdbd1d",
             finalidad: req.param('finalidad')
           })
           .then(function (contrato) {
+            // update comprador
+            if (req.param('usercomp')) {
+              Usuario.findOne({
+                  docid: req.param('usercomp')
+                })
+                .then(function (usuario) {
+
+                  console.log(usuario)
+                  Contrato.update(req.param('id'), {
+                    usuario: usuario.id
+                  }).then(function (vari) {
+                    console.log(vari)
+                    Rol.findOne({
+                        slug: 'comprador'
+                      })
+                      .then(function (rol) {
+                        console.log(rol)
+                        ContratoUsuario.update({
+                          contrato: req.param('id'),
+                          rol:rol.id
+                        }, {
+                          usuario:usuario.id,
+                          descripcion: req.param('docExpeCompra')
+                        })
+                        .then(function(usercom){
+                          console.log("usercom")
+                          console.log(usercom)
+                        })
+                      })
+                  })
+                })
+            }
+            // update vendedor
+            if (req.param('uservend')) {
+              Usuario.findOne({
+                  docid: req.param('uservend')
+                })
+                .then(function (usuario) {
+
+                  console.log(usuario)
+                  Contrato.update(req.param('id'), {
+                    usuario: usuario.id
+                  }).then(function (vari) {
+                    console.log(vari)
+                    Rol.findOne({
+                        slug: 'vendedor'
+                      })
+                      .then(function (rol) {
+                        console.log(rol)
+                        ContratoUsuario.update({
+                          contrato: req.param('id'),
+                          rol:rol.id
+                        }, {
+                          usuario:usuario.id,
+                          descripcion: req.param('docExpeVende')
+                        })
+                        .then(function(usercom){
+                          console.log("vend")
+                          console.log(usercom)
+                        })
+                      })
+                  })
+                })
+            }
+            // articulo
+            if(req.param('slugArt')){
+              Artticulo.findOne({
+                slug: req.param('slugArt')
+              }).then(function(articulo){
+                console.log("articulo")
+                console.log(articulo)
+              })
+            }
+
             return res.send({
               'success': true,
               'massage': "Record Upadte",
