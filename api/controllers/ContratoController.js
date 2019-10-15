@@ -49,6 +49,7 @@ module.exports = {
                   contratoCiudad: req.param('contratoCiudad'),
                   usuario: idusercom,
                   creador: usuariolog.id,
+                  contrato: req.param('padre'),
                   finalidad: req.param('finalidad')
                 })
                 .then(function (contrato) {
@@ -150,79 +151,110 @@ module.exports = {
           })
           .then(function (contrato) {
             // update comprador
-            if (req.param('usercomp')) {
-              Usuario.findOne({
-                  docid: req.param('usercomp')
-                })
-                .then(function (usuario) {
 
-                  console.log(usuario)
-                  Contrato.update(req.param('id'), {
-                    usuario: usuario.id
-                  }).then(function (vari) {
-                    console.log(vari)
-                    Rol.findOne({
-                        slug: 'comprador'
-                      })
-                      .then(function (rol) {
-                        console.log(rol)
-                        ContratoUsuario.update({
-                          contrato: req.param('id'),
-                          rol:rol.id
-                        }, {
-                          usuario:usuario.id,
-                          descripcion: req.param('docExpeCompra')
-                        })
-                        .then(function(usercom){
-                          console.log("usercom")
-                          console.log(usercom)
-                        })
-                      })
-                  })
-                })
-            }
-            // update vendedor
             if (req.param('uservend')) {
               Usuario.findOne({
                   docid: req.param('uservend')
                 })
                 .then(function (usuario) {
 
-                  console.log(usuario)
+                  Rol.findOne({
+                      slug: 'vendedor'
+                    })
+                    .then(function (rol) {
+                      ContratoUsuario.update({
+                          contrato: req.param('id'),
+                          rol: rol.id
+                        }, {
+                          usuario: usuario.id,
+                          descripcion: req.param('docExpeVende')
+                        })
+                        .then(function (uservend) {
+
+                        })
+                    })
+                })
+            }
+            // update vendedor
+            if (req.param('usercomp')) {
+
+              Usuario.findOne({
+                  docid: req.param('usercomp')
+                })
+                .then(function (usuario) {
+
                   Contrato.update(req.param('id'), {
                     usuario: usuario.id
                   }).then(function (vari) {
-                    console.log(vari)
                     Rol.findOne({
-                        slug: 'vendedor'
+                        slug: 'comprador'
                       })
                       .then(function (rol) {
-                        console.log(rol)
+
                         ContratoUsuario.update({
-                          contrato: req.param('id'),
-                          rol:rol.id
-                        }, {
-                          usuario:usuario.id,
-                          descripcion: req.param('docExpeVende')
-                        })
-                        .then(function(usercom){
-                          console.log("vend")
-                          console.log(usercom)
-                        })
+                            contrato: req.param('id'),
+                            rol: rol.id
+                          }, {
+                            usuario: usuario.id,
+                            descripcion: req.param('docExpeCompra')
+                          })
+                          .then(function (usercomp) {})
                       })
                   })
                 })
             }
-            // articulo
-            if(req.param('slugArt')){
-              Artticulo.findOne({
-                slug: req.param('slugArt')
-              }).then(function(articulo){
-                console.log("articulo")
-                console.log(articulo)
-              })
-            }
 
+            ContratoEtiqueta.find({
+                contrato: req.param("id")
+              })
+              .then(function (contratoEtiqueta) {
+                sails.log.debug(contratoEtiqueta)
+                //update contrato articulo
+                if (req.param('slugArt')) {
+                  Articulo.findOne({
+                    slug: req.param('slugArt')
+                  }).then(function (articulo) {
+
+                    ContratoArticulo.update({
+                        contrato: req.param("id")
+                      }, {
+                        articulo: articulo.id
+                      })
+                      .then(function (upart) {
+                        console.log('upart')
+                        console.log(upart)
+                      })
+                  })
+                }
+
+                if (req.param('valor') || req.param('descripcion') || req.param('valorletra')) {
+                  ContratoEtiqueta.update({
+                    contrato: req.param("id"),
+                    titulo: 'Precio'
+                  }, {
+                    valor: req.param('valor'),
+                    valorDescripcion: req.param('valorletra'),
+                    descripcion: req.param('descripcion')
+                  }).then(function (precio) {
+                    console.log(precio)
+                  })
+                }
+
+                if (req.param('fechainicia') || req.param('contratoCiudad')) {
+                  ContratoEtiqueta.update({
+                    contrato: req.param("id"),
+                    titulo: 'Aceptacion'
+                  }, {
+                    fecha: req.param('fechainicia'),
+                    descripcion: req.param('contratoCiudad')
+                  }).then(function (precio) {
+                    console.log(precio)
+                  })
+                }
+
+              }).catch(err => {
+                sails.log.debug(err)
+              })
             return res.send({
               'success': true,
               'massage': "Record Upadte",

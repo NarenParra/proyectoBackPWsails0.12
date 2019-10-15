@@ -21,12 +21,12 @@ module.exports = {
     creador: {
       model: "usuario"
     },
-    // contrato:{
-    //   model:"contrato"
-    // },
-   finalidad:{
-     type:"string"
-   },
+    contrato: {
+      model: "contrato"
+    },
+    finalidad: {
+      type: "string"
+    },
     valor: {
       type: "float"
     },
