@@ -133,10 +133,10 @@ module.exports = {
         slug: req.param("estado")
       })
       .then((estado) => {
-        sails.log.debug(estado.id)
-
+        //sails.log.debug(estado.id)
+        console.log('entra update')
         // sails.log.debug(req.param('id'))
-
+        console.log(req.param('id'))
 
         Contrato.update(req.param('id'), {
             estado: estado.id,
@@ -151,7 +151,6 @@ module.exports = {
           })
           .then(function (contrato) {
             // update comprador
-
             if (req.param('uservend')) {
               Usuario.findOne({
                   docid: req.param('uservend')
@@ -262,6 +261,7 @@ module.exports = {
             })
           })
           .catch(err => {
+            console.log(err)
             return res.send({
               success: true,
               massage: "contrato no Found  ",

@@ -52,6 +52,7 @@ module.exports.routes = {
   'POST /api/contratoEtiqueta' : 'ContratoEtiquetaController.create',
   'GET /api/contratoEtiqueta' : 'ContratoEtiquetaController.get',
   'GET /api/usuario' :'UsuarioController.get',
+  'GET /api/user' :'UserController.get',
   'GET /api/rol' :'RolController.get',
   'GET /api/contratousuario' :'ContratoUsuarioController.get',
   'GET /api/contratoarticulo' :'ContratoArticuloController.get',
