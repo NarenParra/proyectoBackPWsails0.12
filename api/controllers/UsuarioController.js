@@ -18,5 +18,17 @@ module.exports = {
             return res.serverError(err);
           });
       },
+      post: function(req,res){
+        Usuario.create({
+          docid:req.param('docid'),
+          nombre: req.param('nombre'),
+          tipodocid: req.param('tipodoc')
+        }).then(function(usuario){
+            console.log(usuario)
+        })
+        .catch(function (err) {
+          return res.serverError(err);
+        });
+    }
 };
 

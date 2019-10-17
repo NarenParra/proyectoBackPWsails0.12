@@ -17,12 +17,6 @@ module.exports = {
           });
       },
 
-    post: function(req,res){
-        Usuario.create({
-
-        }).then(function(usuario){
-            console.log(usuario)
-        })
-    }
+    
 };
 

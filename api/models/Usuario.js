@@ -10,6 +10,12 @@ module.exports = {
     username: {
       type: "string"
     },
+    nombre: {
+      type: "string"
+    },
+    apellidor: {
+      type: "string"
+    },
     docid: {
       type: "string"
     },
