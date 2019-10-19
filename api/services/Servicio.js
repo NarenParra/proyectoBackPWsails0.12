@@ -208,8 +208,6 @@ module.exports = {
 
   crearContratoEtiqueta: function funcreate(parametros, contrato, valor, valorletra, fechainicio, cantidadperiodo, unidadperiodo,descripcion) {
     var ff = new Promise((rej, res) => {
-      sails.log.debug(cantidadperiodo)
-      sails.log.debug(unidadperiodo)
       Etiqueta.findOne({
           slug: parametros
         })
