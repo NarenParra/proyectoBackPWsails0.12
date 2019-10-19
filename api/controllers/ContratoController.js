@@ -53,19 +53,20 @@ module.exports = {
                   finalidad: req.param('finalidad')
                 })
                 .then(function (contrato) {
-
-                  Servicio.crearContratoEtiqueta(req.param('slugObj'), contrato.id, 0, "", "", "")
+                  console.log(req.param('cantidadPeriodo'))
+                  console.log(req.param('unidadPeriodo'))
+                  Servicio.crearContratoEtiqueta(req.param('slugObj'), contrato.id, 0, "", "", "","","")
                     .then(function (fce) {
                       Servicio.crearContratoArticulo(req.param('slugArt'), contrato.id, fce.id, contrato.valor)
                         .then(function (fca) {})
                     })
 
                     .then(function (ff) {
-                      Servicio.crearContratoEtiqueta(req.param('slugPre'), contrato.id, contrato.valor, req.param('valorletra'), "", req.param('descripcion'))
+                      Servicio.crearContratoEtiqueta(req.param('slugPre'), contrato.id, contrato.valor, req.param('valorletra'), "", req.param('cantidadPeriodo'), req.param('unidadPeriodo'),req.param('descripcion'))
                         .then(function (fce) {})
 
                     }).then(function (ff) {
-                      Servicio.crearContratoEtiqueta(req.param('slugAcep'), contrato.id, 0, "", contrato.fechainicia, req.param('lugarContrato'))
+                      Servicio.crearContratoEtiqueta(req.param('slugAcep'), contrato.id, 0, "", contrato.fechainicia, "", "", req.param('lugarContrato'))
                         .then(function (fcac) {
                           //res.send(fcac)
                         })
@@ -134,9 +135,9 @@ module.exports = {
       })
       .then((estado) => {
         //sails.log.debug(estado.id)
-        console.log('entra update')
+        //console.log('entra update')
         // sails.log.debug(req.param('id'))
-        console.log(req.param('id'))
+       // console.log(req.param('id'))
 
         Contrato.update(req.param('id'), {
             estado: estado.id,
@@ -220,8 +221,8 @@ module.exports = {
                         articulo: articulo.id
                       })
                       .then(function (upart) {
-                        console.log('upart')
-                        console.log(upart)
+                       // console.log('upart')
+                        //console.log(upart)
                       })
                   })
                 }
@@ -235,7 +236,7 @@ module.exports = {
                     valorDescripcion: req.param('valorletra'),
                     descripcion: req.param('descripcion')
                   }).then(function (precio) {
-                    console.log(precio)
+                   // console.log(precio)
                   })
                 }
 
@@ -247,7 +248,7 @@ module.exports = {
                     fecha: req.param('fechainicia'),
                     descripcion: req.param('contratoCiudad')
                   }).then(function (precio) {
-                    console.log(precio)
+                   // console.log(precio)
                   })
                 }
 

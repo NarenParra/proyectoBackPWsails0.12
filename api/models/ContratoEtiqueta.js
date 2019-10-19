@@ -31,9 +31,16 @@ module.exports = {
     valor: {
       type: "float"
     },
-    contratoArticulo:{
-      model:"contratoarticulo"
+    contidadPeridod:{
+      type:"integer"
     },
+    unidadPeriodo:{
+      type:"string"
+    },
+    /// cantidadperiodo y unidadperiodo
+    // contratoArticulo:{
+    //   model:"contratoarticulo"
+    // },
     fecha:{
       type:"date"
     }
