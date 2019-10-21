@@ -45,6 +45,8 @@ module.exports = {
                   estado: estado.id,
                   observaciones: req.param('observaciones'),
                   valor: req.param('valor'),
+                  pagado: req.param('pagado'),
+                  cancelo: req.param('cancelo'),
                   fechainicia: req.param('fechainicia'),
                   contratoCiudad: req.param('contratoCiudad'),
                   usuario: idusercom,
@@ -53,13 +55,13 @@ module.exports = {
                   finalidad: req.param('finalidad')
                 })
                 .then(function (contrato) {
-                  Servicio.crearContratoEtiqueta(req.param('slugObj'), contrato.id, 0, "", "", 0,"","")
+                  Servicio.crearContratoEtiqueta(req.param('slugObj'), contrato.id, 0, "", "", 0, "", "")
                     .then(function (fce) {
                       Servicio.crearContratoArticulo(req.param('slugArt'), contrato.id, fce.id, contrato.valor)
                         .then(function (fca) {})
                     })
                     .then(function (ff) {
-                      Servicio.crearContratoEtiqueta(req.param('slugPre'), contrato.id, contrato.valor, req.param('valorletra'), "", req.param('cantidadPeriodo'), req.param('unidadPeriodo'),req.param('descripcion'))
+                      Servicio.crearContratoEtiqueta(req.param('slugPre'), contrato.id, contrato.valor, req.param('valorletra'), "", req.param('cantidadPeriodo'), req.param('unidadPeriodo'), req.param('descripcion'))
                         .then(function (fce) {})
 
                     }).then(function (ff) {
@@ -134,12 +136,14 @@ module.exports = {
         //sails.log.debug(estado.id)
         //console.log('entra update')
         // sails.log.debug(req.param('id'))
-       // console.log(req.param('id'))
+        // console.log(req.param('id'))
 
         Contrato.update(req.param('id'), {
             estado: estado.id,
             observaciones: req.param('observaciones'),
             valor: req.param('valor'),
+            pagado: req.param('pagado'),
+            cancelo: req.param('cancelo'),
             fechainicia: req.param('fechainicia'),
             contratoCiudad: req.param('contratoCiudad'),
             //usuario: idusercom,
@@ -218,7 +222,7 @@ module.exports = {
                         articulo: articulo.id
                       })
                       .then(function (upart) {
-                       // console.log('upart')
+                        // console.log('upart')
                         //console.log(upart)
                       })
                   })
@@ -231,9 +235,11 @@ module.exports = {
                   }, {
                     valor: req.param('valor'),
                     valorDescripcion: req.param('valorletra'),
-                    descripcion: req.param('descripcion')
+                    descripcion: req.param('descripcion'),
+                    cantidadPeriodo: req.param('cantidadPeriodo'),
+                    unidadPeriodo: req.param('unidadPeriodo')
                   }).then(function (precio) {
-                   // console.log(precio)
+                    // console.log(precio)
                   })
                 }
 
@@ -245,11 +251,12 @@ module.exports = {
                     fecha: req.param('fechainicia'),
                     descripcion: req.param('contratoCiudad')
                   }).then(function (precio) {
-                   // console.log(precio)
+                    // console.log(precio)
                   })
                 }
 
               }).catch(err => {
+                sails.log.debug("err")
                 sails.log.debug(err)
               })
             return res.send({

@@ -15,6 +15,9 @@ module.exports = {
     observaciones: {
       type: "string"
     },
+    concelo:{
+      type:"boolean"
+    },
     usuario: {
       model: "usuario"
     },
@@ -30,9 +33,9 @@ module.exports = {
     valor: {
       type: "float"
     },
-    // pagado:{
-    //   type:"float"
-    // },
+    pagado: {
+      type: "float"
+    },
     fechainicia: {
       type: "date"
     },

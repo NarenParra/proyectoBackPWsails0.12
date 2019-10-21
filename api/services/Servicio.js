@@ -167,6 +167,7 @@ module.exports = {
           }
         })
         .then(function (variables) {
+          console.log(variables)
           if (!variables || variables.length == 0) {
             rej({
               success: false,
@@ -221,7 +222,7 @@ module.exports = {
               valorDescripcion: valorletra,
               fecha: fechainicio,
               descripcion: descripcion,
-              contidadPeridod: cantidadperiodo,
+              cantidadPeriodo: cantidadperiodo,
               unidadPeriodo: unidadperiodo
             })
             .then(function (contratoetiqueta) {
