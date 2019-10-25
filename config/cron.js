@@ -55,34 +55,35 @@ module.exports.cron = {
                       if (contratoetiqueta.descripcion == "En una fecha determinada posterior") {
                         console.log('entra fecha otra')
                         // va la logica de que hay que hacer con fecha posterior
-                        var unidad="";
+                        var unidad = "";
                         if (contratoetiqueta.unidadPeriodo == 'Días') {
-                          unidad= "days";
-                        } else if (contratoetiqueta.unidadPeriodo == 'Meses') { 
-                          unidad="month"
+                          unidad = "days";
+                        } else if (contratoetiqueta.unidadPeriodo == 'Meses') {
+                          unidad = "month"
                         } else if (contratoetiqueta.unidadPeriodo == 'Años') {
-                          unidad="year"
+                          unidad = "year"
                         }
 
-                  
-
-                        console.log("unidad")
-                        console.log(unidad)
-                        var inicio = moment(element.fechainicia).add(1,'days').format("YYYY-MM-DD");
+                        var inicio = moment(element.fechainicia).add(1, 'days').format("YYYY-MM-DD");
                         console.log("inicio")
                         console.log(inicio)
                         var inicioCantidad = moment(inicio).add(contratoetiqueta.cantidadPeriodo, unidad).format("YYYY-MM-DD");
                         console.log("inicioCantidad")
                         console.log(inicioCantidad)
                         var now = moment().format("YYYY-MM-DD");
+
                         var diferencia = moment(inicioCantidad).diff(inicio, 'days');
                         console.log("diferencia")
                         console.log(diferencia)
 
+                        var diasParaPago = moment(inicioCantidad).diff(now, 'days');
+                        console.log("dias")
+                        console.log(diasParaPago)
+
                         console.log(contador++)
 
-                        if (diferencia >= 1 && diferencia <= 3) {
-                          console.log('debe pagar pronto')
+                        if (diasParaPago > 0 && diasParaPago <= 3) {
+                          console.log('debe pagar pronto, faltan ' + diasParaPago + ' dias para el pago')
                           // cumo sacar los usuarios?
 
                           // estructura Email
@@ -93,15 +94,60 @@ module.exports.cron = {
                           //   text: `Hi there, this email was automatically sent by us`
                           // };
                         } else if (moment(now).isSame(inicioCantidad)) {
-                          console.log('Dia del pago')
+                          console.log('Hoy es el dia del pago, faltan ' + diasParaPago + ' dias para el pago')
                         } else if (moment(moment(now)).isAfter(inicioCantidad)) {
-                          console.log('Pago atrazado');
-
+                          console.log('Pago atrazado, ' + diasParaPago + ' dias ')
                         }
-
 
                       } else if (contratoetiqueta.descripcion == "De forma periodica") {
                         console.log('PERIODICA')
+                        var unidad = "";
+                        if (contratoetiqueta.unidadPeriodo == 'Mensuales') {
+                          unidad = "month"
+                        } else if (contratoetiqueta.unidadPeriodo == 'Anuales') {
+                          unidad = "year"
+                        }
+
+                        console.log("unidad")
+                        console.log(unidad)
+                        var inicio = moment(element.fechainicia).add(1, 'days').format("YYYY-MM-DD");
+                        console.log("inicio")
+                        console.log(inicio)
+                        var diferencia = "";
+
+                        Pagos.findOne({
+                          contrato: element.id
+                        }).sort({
+                          $natural: -1
+                        }).exec((err, pago) => {
+                          if (err) {
+                            
+                          }
+                          if (pagos == 0) {
+                            var now = moment().format("YYYY-MM-DD");
+                            diferencia = moment(now).diff(inicio, 'days');
+                            console.log(diferencia)
+                          } else {
+                            console.log('pagos.length')
+                            console.log(pagos)
+
+                          }
+
+                        })
+
+
+                        var inicioCantidad = moment(inicio).add(1, unidad).format("YYYY-MM-DD");
+                        console.log("inicioCantidad")
+                        console.log(inicioCantidad)
+                        var now = moment().format("YYYY-MM-DD");
+                        var diferencia = moment(inicioCantidad).diff(inicio, 'days');
+                        console.log("diferencia")
+                        console.log(diferencia)
+
+                        var diasParaPago = moment(inicioCantidad).diff(now, 'days');
+                        console.log("dias")
+                        console.log(diasParaPago)
+
                       }
                     }
                   })
