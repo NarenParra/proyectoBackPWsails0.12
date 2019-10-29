@@ -17,11 +17,11 @@ module.exports = {
     fecha:{
       type:"date"
     },
-    valor:{
+    monto:{
       type:"float"
     },
-    cuota:{
-      tipe:"integer"
+    tipo:{
+      type:"string"
     }
   }
 };
