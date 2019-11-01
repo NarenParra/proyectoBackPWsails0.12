@@ -7,7 +7,6 @@ module.exports.cron = {
     schedule: '* * * * * *',
     onTick: function () {
 
-
       Contrato.find()
         .populate('estado')
         .exec((err, contrato) => {
@@ -20,7 +19,6 @@ module.exports.cron = {
 
             // console.log("contrato")
             // console.log(contrato)
-
 
             contrato.forEach(element => {
               if (element.estado.slug == 'iniciado') {
@@ -77,7 +75,7 @@ module.exports.cron = {
                             // calcular intereses
                           }
 
-                        } // else if (contratoetiqueta.descripcion == "De forma periodica") {
+                        }  else if (contratoetiqueta.descripcion == "De forma periodica") {
                         //   console.log("Peroidico")
                         //   console.log(element)
                         //   var now = moment().format("YYYY-MM-DD");
@@ -86,35 +84,37 @@ module.exports.cron = {
                         //   diferencia = moment(now).diff(inicio, 'days');
                         //   console.log("diferencia")
                         //   console.log(diferencia)
-                        // }
+                         }
                       } else {
                         if (contratoetiqueta.descripcion == "En una fecha determinada posterior") {
                           console.log("entra else posterior")
 
-                          Estado.findOne({
-                            slug: "finalizado"
-                          }).exec((err, stade) => {
-                            if (err) {
-                              console.log("err")
-                            }
-                            if (stade == 0) {
-                              console.log("no estado")
-                            } else {
-                              if (pago[0].monto == element.valor) {
-                                console.log("entra if")
-                                Contrato.update(element.id, {
-                                  pagado: pago[0].monto,
-                                  cancelo: true,
-                                  estado: stade.id
-                                }).exec((err, contratoup) => {
-                                  if (err) {
-                                    return res.serverError(err);
-                                  }
-                                })
+                          if (element.finalidad == "Compraventa") {
+                            Estado.findOne({
+                              slug: "finalizado"
+                            }).exec((err, stade) => {
+                              if (err) {
+                                console.log("err")
                               }
+                              if (stade == 0) {
+                                console.log("no estado")
+                              } else {
+                                if (pago[0].monto == element.valor) {
+                                  console.log("entra if")
+                                  Contrato.update(element.id, {
+                                    pagado: pago[0].monto,
+                                    cancelo: true,
+                                    estado: stade.id
+                                  }).exec((err, contratoup) => {
+                                    if (err) {
+                                      return res.serverError(err);
+                                    }
+                                  })
+                                }
+                              }
+                            })
+                          }
 
-                            }
-                          })
                         }
                       }
                     })
