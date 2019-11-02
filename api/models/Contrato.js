@@ -9,10 +9,11 @@ module.exports = {
   tableName: "contrato",
   attributes: {
     //contrato
+    // agregar descripccion y tipo(Compraventa)
     estado: {
       model: "estado"
     },
-    observaciones: {
+    observaciones: { // 
       type: "string"
     },
     concelo:{
@@ -27,7 +28,7 @@ module.exports = {
     contrato: {
       model: "contrato"
     },
-    finalidad: {
+    finalidad: {//TITULO
       type: "string"
     },
     valor: {

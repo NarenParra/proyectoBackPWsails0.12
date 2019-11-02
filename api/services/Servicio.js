@@ -43,7 +43,7 @@ module.exports = {
                 }
               }).then(function (datos) {
                 sails.log(variables.estado)
-                variables.estado=datos.titulo;
+                variables.estado = datos.titulo;
                 rej({
                   success: true,
                   massage: "Records fetched",
@@ -51,9 +51,9 @@ module.exports = {
                 });
               })
             });
-            
+
           }
-          
+
         })
         .catch(function (err) {
           sails.log.debug(err);
@@ -207,7 +207,7 @@ module.exports = {
     return ff;
   },
 
-  crearContratoEtiqueta: function funcreate(parametros, contrato, valor, valorletra, fechainicio, cantidadperiodo, unidadperiodo,descripcion) {
+  crearContratoEtiqueta: function funcreate(parametros, contrato, valor, valorletra, fechainicio, cantidadperiodo, unidadperiodo, descripcion) {
     var ff = new Promise((rej, res) => {
       Etiqueta.findOne({
           slug: parametros
@@ -336,6 +336,34 @@ module.exports = {
         });
     });
     return ff;
+  },
+
+
+  crearMensaje: function (titulo, descripcion, contrato, hora, fecha) {
+    var ff = new Promise((rej, res) => {
+      Mensaje.create({
+          titulo: titulo,
+          descripcion: descripcion,
+          hora: hora,
+          fecha: fecha,
+          contrato: contrato
+        })
+        .then(function (mensaje) {
+          return rej({
+            success: true,
+            massage: "Creado Correctamente ",
+            data: mensaje
+          });
+        })
+        .catch(err => {
+          return rej({
+            success: true,
+            massage: "Error crear mensaje ",
+            'err': err
+          });
+        });
+    })
+    return ff
   }
   // sayHello: function sayHelloService(llegada) {
   //   return 'Hello I am servicio'+llegada;
