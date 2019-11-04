@@ -10,10 +10,13 @@ module.exports = {
     username: {
       type: "string"
     },
+    email:{
+      type:"string"
+    },
     nombre: {
       type: "string"
     },
-    apellidor: {
+    apellido: {
       type: "string"
     },
     docid: {
@@ -24,6 +27,12 @@ module.exports = {
     },
     tipopersona: {
       type: "string"
+    },
+    direccion:{
+      type:"string"
+    },
+    expediciondoc:{
+      type:"string"
     }
   }
 };

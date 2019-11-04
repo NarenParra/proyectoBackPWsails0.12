@@ -48,7 +48,7 @@ module.exports = {
                   pagado: req.param('pagado'),
                   cancelo: req.param('cancelo'),
                   fechainicia: req.param('fechainicia'),
-                  contratoCiudad: req.param('contratoCiudad'),
+                  contratociudad: req.param('contratoCiudad'),
                   usuario: idusercom,
                   creador: usuariolog.id,
                   contrato: req.param('padre'),
@@ -72,7 +72,7 @@ module.exports = {
                     })
                     .then(function (ff) {
 
-                      Servicio.crearContratoUsuario(usuariocom, contrato.id, "comprador", req.param("docExpeCompra"))
+                      Servicio.crearContratoUsuario(usuariocom, contrato.id, "comprador")
                         .then(function (fce) {
                           //res.send(fce)
                         })
@@ -83,7 +83,7 @@ module.exports = {
                       }).then((usuariovend) => {
                         //sails.log.debug(usuariovend)
 
-                        Servicio.crearContratoUsuario(usuariovend, contrato.id, "vendedor", req.param("docExpeVende"))
+                        Servicio.crearContratoUsuario(usuariovend, contrato.id, "vendedor")
                           .then(function (fce) {
                             // sails.log.debug(res.send(fce))
                             res.send(fce)
@@ -145,7 +145,7 @@ module.exports = {
             pagado: req.param('pagado'),
             cancelo: req.param('cancelo'),
             fechainicia: req.param('fechainicia'),
-            contratoCiudad: req.param('contratoCiudad'),
+            contratociudad: req.param('contratoCiudad'),
             //usuario: idusercom,
             //debe ser tomado del usuario logueado
             creador: "5d96535058699210f8bdbd1d",
@@ -168,7 +168,6 @@ module.exports = {
                           rol: rol.id
                         }, {
                           usuario: usuario.id,
-                          descripcion: req.param('docExpeVende')
                         })
                         .then(function (uservend) {
 

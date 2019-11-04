@@ -40,7 +40,7 @@ module.exports = {
     fechainicia: {
       type: "date"
     },
-    contratoCiudad: {
+    contratociudad: {
       type: "string"
     }
 

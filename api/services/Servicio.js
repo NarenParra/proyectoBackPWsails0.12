@@ -251,7 +251,7 @@ module.exports = {
     return ff;
   },
 
-  crearContratoUsuario: function funcreate(usuario, contrato, rol, descripcion) {
+  crearContratoUsuario: function funcreate(usuario, contrato, rol) {
 
     var ff = new Promise((rej, res) => {
       var iduser = null
@@ -267,8 +267,7 @@ module.exports = {
           ContratoUsuario.create({
               contrato: contrato,
               usuario: iduser,
-              rol: rolb.id,
-              descripcion: descripcion
+              rol: rolb.id              
             })
             .then(function (contratoUsuario) {
               return rej({
