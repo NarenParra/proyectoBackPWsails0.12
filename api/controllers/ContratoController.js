@@ -9,14 +9,44 @@ module.exports = {
 
   get: function (req, res) {
 
-    Servicio.obtener(Contrato)
-      .then(function (ff) {
-        res.send(ff)
-        //sails.log.debug(ff)
-      })
-      .catch(function (err) {
-        return res.serverError(err);
-      });
+
+    Estado.findOne({
+      slug: req.param("estado")
+    })
+    .exec((err,estado)=>{
+      if(err){
+        res.serverError(err);
+      }
+      if(!estado){
+        return res.send({
+          success: false,
+          massage: "An Error ",
+          'err': err
+        });
+      }else{
+        Contrato.find({
+          estado:estado.id
+        })
+        .exec((err,contrato)=>{
+          if(err){
+            res.serverError(err);
+          }
+          if(estado.length ==0){
+            return res.send({
+              success: false,
+              massage: "no hay contrato ",
+            });
+          }else{
+            return res.send({
+              success: false,
+              massage: "no hay contrato ",
+              data:contrato
+            });
+          }
+
+        })
+      }
+    });
   },
 
   create: function (req, res) {
