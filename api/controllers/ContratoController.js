@@ -11,42 +11,42 @@ module.exports = {
 
 
     Estado.findOne({
-      slug: req.param("estado")
-    })
-    .exec((err,estado)=>{
-      if(err){
-        res.serverError(err);
-      }
-      if(!estado){
-        return res.send({
-          success: false,
-          massage: "An Error ",
-          'err': err
-        });
-      }else{
-        Contrato.find({
-          estado:estado.id
-        })
-        .exec((err,contrato)=>{
-          if(err){
-            res.serverError(err);
-          }
-          if(estado.length ==0){
-            return res.send({
-              success: false,
-              massage: "no hay contrato ",
-            });
-          }else{
-            return res.send({
-              success: false,
-              massage: "no hay contrato ",
-              data:contrato
-            });
-          }
+        slug: req.param("estado")
+      })
+      .exec((err, estado) => {
+        if (err) {
+          res.serverError(err);
+        }
+        if (!estado) {
+          return res.send({
+            success: false,
+            massage: "An Error ",
+            'err': err
+          });
+        } else {
+          Contrato.find({
+              estado: estado.id
+            })
+            .exec((err, contrato) => {
+              if (err) {
+                res.serverError(err);
+              }
+              if (estado.length == 0) {
+                return res.send({
+                  success: false,
+                  massage: "no hay contrato ",
+                });
+              } else {
+                return res.send({
+                  success: false,
+                  massage: "no hay contrato ",
+                  data: contrato
+                });
+              }
 
-        })
-      }
-    });
+            })
+        }
+      });
   },
 
   create: function (req, res) {
@@ -55,6 +55,7 @@ module.exports = {
         slug: req.param("estado")
       })
       .then((estado) => {
+
 
         // sails.log.debug(req.param("userlog"));
         Usuario.findOne({
@@ -87,8 +88,14 @@ module.exports = {
                 .then(function (contrato) {
                   Servicio.crearContratoEtiqueta(req.param('slugObj'), contrato.id, 0, "", "", 0, "", "")
                     .then(function (fce) {
-                      Servicio.crearContratoArticulo(req.param('slugArt'), contrato.id, fce.id, contrato.valor)
-                        .then(function (fca) {})
+
+                      console.log("req.param('slugArt')")
+                      console.log(req.param('slugArt'))
+
+                      req.param('slugArt').forEach(articulo => {
+                        Servicio.crearContratoArticulo(articulo.articulo, contrato.id, fce.id, contrato.valor)
+                          .then(function (fca) {})
+                      });
                     })
                     .then(function (ff) {
                       Servicio.crearContratoEtiqueta(req.param('slugPre'), contrato.id, contrato.valor, req.param('valorletra'), "", req.param('cantidadPeriodo'), req.param('unidadPeriodo'), req.param('descripcion'))
@@ -240,21 +247,33 @@ module.exports = {
               .then(function (contratoEtiqueta) {
                 sails.log.debug(contratoEtiqueta)
                 //update contrato articulo
-                if (req.param('slugArt')) {
-                  Articulo.findOne({
-                    slug: req.param('slugArt')
-                  }).then(function (articulo) {
+                // console.log("req.param('slugArt')")
+                // console.log(req.param('slugArt'))
+                // console.log("fin req.param('slugArt')")
+                if (req.param('slugArt').length>0) {
 
-                    ContratoArticulo.update({
-                        contrato: req.param("id")
-                      }, {
-                        articulo: articulo.id
-                      })
-                      .then(function (upart) {
-                        // console.log('upart')
-                        //console.log(upart)
-                      })
-                  })
+                  ContratoArticulo.destroy({
+                    contrato:req.param("id")
+                  }).then()
+
+                  //console.log("req.param('slugArt')")
+                   req.param('slugArt').forEach(articulo => {
+                     Articulo.findOne({
+                       slug: articulo.articulo
+                     }).then(function (articulo2) {
+                      sails.log.debug(articulo2)
+                       ContratoArticulo.create({
+                           contrato: req.param("id"),
+                           articulo: articulo2.id,
+                           precioVenta:0
+                         })
+                         .then(function (upart) {
+                           // console.log('upart')
+                           //console.log(upart)
+                         })
+                     })
+                   });
+
                 }
 
                 if (req.param('valor') || req.param('descripcion') || req.param('valorletra')) {
@@ -295,7 +314,6 @@ module.exports = {
             })
           })
           .catch(err => {
-            console.log(err)
             return res.send({
               success: true,
               massage: "contrato no Found  ",

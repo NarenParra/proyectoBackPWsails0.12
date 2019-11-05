@@ -1,4 +1,34 @@
 module.exports = {
+
+  findArticulo: function funget(busqueda) {
+    var ff = new Promise((rej, res) => {
+      Articulo.find({
+        id:busqueda
+      })
+        .then(function (variables) {
+          if (!variables || variables.length == 0) {
+            rej({
+              success: false,
+              massage: "No records fund "
+            });
+          }
+          rej({
+            success: true,
+            massage: "Records fetched",
+            data: variables
+          });
+        })
+        .catch(function (err) {
+          sails.log.debug(err);
+          rej({
+            success: false,
+            massage: "Uneable fetch records"
+          })
+        });
+    });
+    return ff;
+  },
+
   obtener: function funget(modelo) {
     var ff = new Promise((rej, res) => {
       modelo.find()
@@ -163,38 +193,16 @@ module.exports = {
     var ff = new Promise((rej, res) => {
       modelo.find({
           where: {
-            contratoEtiqueta: idc
+            contrato: idc
           }
         })
         .then(function (variables) {
-          console.log(variables)
-          if (!variables || variables.length == 0) {
             rej({
-              success: false,
-              massage: "No records fund "
+              success: true,
+              massage: "Records fetched",
+              data: variables
             });
-          } else {
-            Articulo.find({
-                where: {
-                  id: variables[0].articulo
-                }
-              })
-              .then(function (elements) {
-                rej({
-                  success: true,
-                  massage: "Records fetched",
-                  data: elements
-                });
-
-              }).catch(function (err) {
-                sails.log.debug(err);
-                rej({
-                  success: false,
-                  massage: "Uneable fetch records"
-                })
-              });
-          }
-
+         
         })
         .catch(function (err) {
           sails.log.debug(err);
