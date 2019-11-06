@@ -8,20 +8,20 @@
 module.exports = {
   get: function (req, res) {
 
-    Servicio.obtenerCA(ContratoArticulo, req.param('idc'))
-      .then(function (ff) {
-        //res.send(ff)
-        // console.log("articulos devieltos")
-         console.log(ff)
-        Servicio.findArticulo(ff.data.articulo).then(function (articulo) {
-          res.send(articulo)
-          console.log("articulo")
-          console.log(articulo)
-
-        })
-      })
-      .catch(function (err) {
-        return res.serverError(err);
-      });
+    ContratoArticulo.find({
+      contrato:req.param('idc')
+    }).populate('articulo').exec((err,carticulo)=>{
+      if(err){
+        res.serverError(err);
+      }
+      if(!carticulo){
+        return res.send({
+          success: false,
+          massage: "Articulo no Found  ",
+        });
+      }else{
+        res.send(carticulo)
+      }
+    })
   },
 };

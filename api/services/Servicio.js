@@ -189,32 +189,6 @@ module.exports = {
     return ff;
   },
 
-  obtenerCA: function funget(modelo, idc) {
-    var ff = new Promise((rej, res) => {
-      modelo.find({
-          where: {
-            contrato: idc
-          }
-        })
-        .then(function (variables) {
-            rej({
-              success: true,
-              massage: "Records fetched",
-              data: variables
-            });
-         
-        })
-        .catch(function (err) {
-          sails.log.debug(err);
-          rej({
-            success: false,
-            massage: "Uneable fetch records"
-          })
-        });
-    });
-    return ff;
-  },
-
   crearContratoEtiqueta: function funcreate(parametros, contrato, valor, valorletra, fechainicio, cantidadperiodo, unidadperiodo, descripcion) {
     var ff = new Promise((rej, res) => {
       Etiqueta.findOne({
@@ -302,7 +276,7 @@ module.exports = {
     return ff;
   },
 
-  crearContratoArticulo: function funcreate(parametros, contrato, etiqueta, valor) {
+  crearContratoArticulo: function funcreate(parametros, contrato, etiqueta, valor, cantidad) {
     var ff = new Promise((rej, res) => {
       Articulo.findOne({
           slug: parametros
@@ -317,7 +291,8 @@ module.exports = {
               articulo: idart,
               contrato: contrato,
               contratoEtiqueta: etiqueta,
-              precioVenta: valor
+              precioVenta: valor,
+              cantidad: cantidad
             })
             .then(function (contratoArticulo) {
               return rej({

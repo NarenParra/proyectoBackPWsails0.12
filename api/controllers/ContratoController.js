@@ -9,7 +9,6 @@ module.exports = {
 
   get: function (req, res) {
 
-
     Estado.findOne({
         slug: req.param("estado")
       })
@@ -38,8 +37,8 @@ module.exports = {
                 });
               } else {
                 return res.send({
-                  success: false,
-                  massage: "no hay contrato ",
+                  success: true,
+                  massage: "contrato ",
                   data: contrato
                 });
               }
@@ -93,7 +92,7 @@ module.exports = {
                       console.log(req.param('slugArt'))
 
                       req.param('slugArt').forEach(articulo => {
-                        Servicio.crearContratoArticulo(articulo.articulo, contrato.id, fce.id, contrato.valor)
+                        Servicio.crearContratoArticulo(articulo.articulo, contrato.id, fce.id, contrato.valor,articulo.cantidad)
                           .then(function (fca) {})
                       });
                     })
@@ -246,10 +245,7 @@ module.exports = {
               })
               .then(function (contratoEtiqueta) {
                 sails.log.debug(contratoEtiqueta)
-                //update contrato articulo
-                // console.log("req.param('slugArt')")
-                // console.log(req.param('slugArt'))
-                // console.log("fin req.param('slugArt')")
+
                 if (req.param('slugArt').length>0) {
 
                   ContratoArticulo.destroy({
@@ -265,7 +261,8 @@ module.exports = {
                        ContratoArticulo.create({
                            contrato: req.param("id"),
                            articulo: articulo2.id,
-                           precioVenta:0
+                           precioVenta:0,
+                           cantidad:articulo.cantidad
                          })
                          .then(function (upart) {
                            // console.log('upart')

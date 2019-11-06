@@ -8,15 +8,14 @@
 module.exports = {
 
   get: function (req, res) {
-    Mensaje.find({
-
-    }).exec((err, mensaje) => {
+    Mensaje.find().sort({$natural:-1}).exec((err, mensaje) => {
       if (err) {
         res.serverError(err)
       }
       if (mensaje == 0) {
         res.send("no hay datos")
       }else{
+        console.log(mensaje)
           res.send(mensaje)
       }
     })

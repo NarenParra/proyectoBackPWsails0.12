@@ -59,5 +59,7 @@ module.exports.routes = {
   'GET /api/contratoarticulo' :'ContratoArticuloController.get',
   'GET /api/estado' :'EstadoController.get',
   'GET /api/articulo' :'ArticuloController.get',
+  'GET /api/mensaje' :'MensajeController.get',
+  
 
 };
