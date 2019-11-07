@@ -46,6 +46,7 @@ module.exports.routes = {
   *                                                                          *
   ***************************************************************************/
   'GET /api/contrato' :'ContratoController.get',
+  'GET /api/contrato/otra' :'ContratoController.obtener',
   'POST /api/contrato' : 'ContratoController.create',
   'PUT /api/contrato/:id' : 'ContratoController.update',
   'GET /api/test' :'TestController.get',
@@ -59,7 +60,6 @@ module.exports.routes = {
   'GET /api/contratoarticulo' :'ContratoArticuloController.get',
   'GET /api/estado' :'EstadoController.get',
   'GET /api/articulo' :'ArticuloController.get',
-  'GET /api/mensaje' :'MensajeController.get',
-  
+  'GET /api/mensaje' :'MensajeController.get'  
 
 };

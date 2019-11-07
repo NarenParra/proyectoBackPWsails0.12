@@ -48,6 +48,20 @@ module.exports = {
       });
   },
 
+  obtener: function (req, res) {
+
+    Servicio.obtener(Contrato)
+      .then(function (ff) {
+        res.send(ff)
+        //sails.log.debug(ff)
+      })
+      .catch(function (err) {
+        return res.serverError(err);
+      });
+  },
+
+
+
   create: function (req, res) {
 
     Estado.findOne({
@@ -92,7 +106,7 @@ module.exports = {
                       console.log(req.param('slugArt'))
 
                       req.param('slugArt').forEach(articulo => {
-                        Servicio.crearContratoArticulo(articulo.articulo, contrato.id, fce.id, contrato.valor,articulo.cantidad)
+                        Servicio.crearContratoArticulo(articulo.articulo, contrato.id, fce.id, contrato.valor, articulo.cantidad)
                           .then(function (fca) {})
                       });
                     })
@@ -246,30 +260,30 @@ module.exports = {
               .then(function (contratoEtiqueta) {
                 sails.log.debug(contratoEtiqueta)
 
-                if (req.param('slugArt').length>0) {
+                if (req.param('slugArt').length > 0) {
 
                   ContratoArticulo.destroy({
-                    contrato:req.param("id")
+                    contrato: req.param("id")
                   }).then()
 
                   //console.log("req.param('slugArt')")
-                   req.param('slugArt').forEach(articulo => {
-                     Articulo.findOne({
-                       slug: articulo.articulo
-                     }).then(function (articulo2) {
+                  req.param('slugArt').forEach(articulo => {
+                    Articulo.findOne({
+                      slug: articulo.articulo
+                    }).then(function (articulo2) {
                       sails.log.debug(articulo2)
-                       ContratoArticulo.create({
-                           contrato: req.param("id"),
-                           articulo: articulo2.id,
-                           precioVenta:0,
-                           cantidad:articulo.cantidad
-                         })
-                         .then(function (upart) {
-                           // console.log('upart')
-                           //console.log(upart)
-                         })
-                     })
-                   });
+                      ContratoArticulo.create({
+                          contrato: req.param("id"),
+                          articulo: articulo2.id,
+                          precioVenta: 0,
+                          cantidad: articulo.cantidad
+                        })
+                        .then(function (upart) {
+                          // console.log('upart')
+                          //console.log(upart)
+                        })
+                    })
+                  });
 
                 }
 
