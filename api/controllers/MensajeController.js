@@ -8,36 +8,26 @@
 module.exports = {
 
   get: function (req, res) {
-    Mensaje.find().sort({
+  Mensaje.find({
+    contrato:req.param('idc')
+  }).sort({
       $natural: -1
     }).exec((err, mensaje) => {
       if (err) {
         res.serverError(err)
       }
       if (mensaje == 0) {
-        res.send("no hay datos")
+        res.send({
+          success: false,
+          massage: "Mensaje no Found ",
+        })
       } else {
-
-        res.send(mensaje)
+        res.send({
+          success: true,
+          massage: "Mensaje Found ",
+          data:mensaje
+        })
       }
     })
   },
-
-  //   post: function (req, res) {
-  //     Mensaje.created({
-  //         titulo: req.titulo,
-  //         descripcion: req.descripcion,
-  //         hora: req.hora,
-  //         fecha: req.fecha,
-  //         contrato: req.contrato
-  //       })
-  //       .exec((err, mensaje) => {
-  //         if (err) {
-  //           res.serverError(err)
-  //         }else{
-  //             console.log(mensaje)
-  //         }
-  //       })
-  //   }
-
 };
