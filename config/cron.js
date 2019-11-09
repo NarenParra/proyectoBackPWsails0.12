@@ -6,16 +6,15 @@ var titulo = "";
 var descripcion = "";
 var fecha = "";
 var hora = "";
-var now = "";
 var inicio = "";
 var fechapago = "";
-var diasParaPago = "";
+var mensaje ="";
 module.exports.cron = {
 
 
   myFirstJob: {
-    //schedule: '6 * * * * *',
-    schedule: '6 * * * * *',
+    schedule: '6 8 * * * *',
+    //schedule: '* * * * * *',
     onTick: function () {
 
       Contrato.find()
@@ -47,8 +46,11 @@ module.exports.cron = {
                         return res.serverError(err);
                       }
                       if (pago.length == 0) {
-                        if (contratoetiqueta.descripcion == "En una fecha determinada posterior") {
+                        console.log("entra no pago")
+                        console.log(contratoetiqueta.descripcion)
 
+                        if (contratoetiqueta.descripcion == "En una fecha determinada posterior" || contratoetiqueta.descripcion == "De forma periodica") {
+                          console.log("entra if")
                           var unidad = "";
                           if (contratoetiqueta.unidadPeriodo == 'Días') {
                             unidad = "days";
@@ -58,14 +60,24 @@ module.exports.cron = {
                             unidad = "year"
                           }
 
-                          inicio = moment(element.fechainicia).add(1, 'days').format("YYYY-MM-DD");
-                          fechapago = moment(inicio).add(contratoetiqueta.cantidadPeriodo, unidad).format("YYYY-MM-DD");
-                          now = moment().format("YYYY-MM-DD");
-                          diasParaPago = moment(fechapago).diff(now, 'days');
 
+                          if (contratoetiqueta.descripcion == "De forma periodica") {
+                            inicio = moment(element.fechainicia).add(1, 'days').format("YYYY-MM-DD");
+                            fechapago = moment(inicio).add(1, unidad).format("YYYY-MM-DD");
+                            mensaje=" primer pago ";
+
+                          } else if (contratoetiqueta.descripcion == "En una fecha determinada posterior") {
+                            inicio = moment(element.fechainicia).add(1, 'days').format("YYYY-MM-DD");
+                            fechapago = moment(inicio).add(contratoetiqueta.cantidadPeriodo, unidad).format("YYYY-MM-DD");
+                            mensaje=" pago";
+                          }
+
+                          var now = moment().format("YYYY-MM-DD");
+                          var diasParaPago = moment(fechapago).diff(now, 'days');
+                          console.log(diasParaPago)
                           if (diasParaPago > 0 && diasParaPago <= 3) {
                             titulo = "Faltan pocos días para realizar el pago"
-                            descripcion = 'EL contrato se debe pagar pronto, faltan ' + diasParaPago + ' días para el pago'
+                            descripcion = 'EL contrato se debe pagar pronto, faltan ' + diasParaPago + ' días para el '+mensaje
                             hora = moment().format('HH:mm');
                             fecha = now
                             Servicio.crearMensaje(titulo, descripcion, element.id, hora, fecha)
@@ -74,7 +86,7 @@ module.exports.cron = {
                               })
                           } else if (moment(now).isSame(fechapago)) {
                             titulo = "Hoy, día de pago"
-                            descripcion = "Flatan 0 dias para el pago"
+                            descripcion = "Flatan 0 dias para el" + mensaje
                             hora = moment().format('HH:mm');
                             fecha = now
                             Servicio.crearMensaje(titulo, descripcion, element.id, hora, fecha)
@@ -90,7 +102,7 @@ module.exports.cron = {
                               //calcular intereses
 
                               titulo = "Se encuentra en mora"
-                              descripcion = "El pago esta atrasado" + diasParaPago + '  días ';
+                              descripcion = "El "+mensaje+" esta atrasado" + diasParaPago + '  días ';
                               hora = moment().format('HH:mm');
                               fecha = now
                               Servicio.crearMensaje(titulo, descripcion, element.id, hora, fecha)
@@ -99,7 +111,7 @@ module.exports.cron = {
                                 })
                             } else if (diasParaPago * -1 > 60) {
                               titulo = "Mora mayor a dos meses"
-                              descripcion = "El pago esta atrasado" + diasParaPago + '  días. ' + "El caso fue enviado a jurídica";
+                              descripcion = "El "+mensaje+"esta atrasado" + diasParaPago + '  días. ' + "El caso fue enviado a jurídica";
                               hora = moment().format('HH:mm');
                               fecha = now
                               Servicio.crearMensaje(titulo, descripcion, element.id, hora, fecha)
@@ -109,24 +121,7 @@ module.exports.cron = {
                               //enviar email a juridica
 
                             }
-                          }
-                        } else if (contratoetiqueta.descripcion == "De forma periodica") {
-
-                          if (contratoetiqueta.unidadPeriodo == 'Días') {
-                            unidad = "days";
-                          } else if (contratoetiqueta.unidadPeriodo == 'Mensuales') {
-                            unidad = "month"
-                          } else if (contratoetiqueta.unidadPeriodo == 'Anuales') {
-                            unidad = "year"
-                          }
-
-                          if (unidad == "year" || unidad == "month") {
-                            inicio = moment(element.fechainicia).add(1, 'days').format("YYYY-MM-DD");
-                            fechapago = moment(inicio).add(1, unidad).format("YYYY-MM-DD");
-                          }else{
-                            fechapago = moment(inicio).add(contratoetiqueta.cantidadPeriodo, unidad).format("YYYY-MM-DD");
-                          }
-                          console.log(fechapago)
+                          } /// no primer pago
                         }
 
                       } else { //ya con pagos
