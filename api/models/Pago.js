@@ -22,7 +22,11 @@ module.exports = {
     },
     tipo:{
       type:"string"
+    },
+    cuota:{
+      type:"integer"
     }
+
   }
 };
 
