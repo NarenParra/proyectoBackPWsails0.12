@@ -1,7 +1,6 @@
 var moment = require('moment');
 moment.locale('es');
 
-var contador = 0;
 var titulo = "";
 var descripcion = "";
 var fecha = "";
@@ -76,6 +75,9 @@ module.exports.cron = {
 
                           var now = moment().format("YYYY-MM-DD");
                           var diasParaPago = moment(fechapago).diff(now, 'days');
+                          var interes = 0;
+                          var nuevoValorPago = 0;
+                          var valorAnterior = 0;
                           console.log(diasParaPago)
                           if (diasParaPago > 0 && diasParaPago <= 3) {
                             titulo = "Faltan pocos días para realizar el pago"
@@ -100,10 +102,26 @@ module.exports.cron = {
                             console.log("entra after")
                             console.log(diasParaPago)
                             if (diasParaPago * -1 > 0 && diasParaPago * -1 <= 60) {
-                              //calcular intereses
+
+                              //Los intereses establecidos son de 3% mensual
+
+                              if (contratoetiqueta.descripcion == "En una fecha determinada posterior") { // se calcula sobre el monto total
+                                valorAnterior = element.valor;
+                                interes = ((element.valor * 0.30) / 30) * (diasParaPago * -1);
+
+                                nuevoValorPago = valorAnterior + interes;
+                                console.log("fecha determinada")
+
+                              } else if (contratoetiqueta.descripcion == "De forma periodica") { // se calcula sobre el valor de la cuota
+                                valorAnterior = (element.valor - element.pagado) / contratoetiqueta.cantidadPeriodo;
+                                interes = (((valorAnterior) * 0.30) / 30) * (diasParaPago * -1);
+
+                                nuevoValorPago = valorAnterior + interes;
+                                console.log("periodica")
+                              }
 
                               titulo = "Se encuentra en mora"
-                              descripcion = "El " + mensaje + " esta atrasado" + diasParaPago + '  días ';
+                              descripcion = "El " + mensaje + " está atrasado" + diasParaPago + "  días" + " El valor a pagar era de " + valorAnterior + ". El nuevo valor a pagar con intereses es de " + nuevoValorPago + "PESOS";
                               hora = moment().format('HH:mm');
                               fecha = now
                               Servicio.crearMensaje(titulo, descripcion, element.id, hora, fecha)
@@ -112,7 +130,7 @@ module.exports.cron = {
                                 })
                             } else if (diasParaPago * -1 > 60) {
                               titulo = "Mora mayor a dos meses"
-                              descripcion = "El " + mensaje + "esta atrasado" + diasParaPago + '  días. ' + "El caso fue enviado a jurídica";
+                              descripcion = "El " + mensaje + "está atrasado" + diasParaPago + '  días. ' + "El caso fue enviado a jurídica";
                               hora = moment().format('HH:mm');
                               fecha = now
                               Servicio.crearMensaje(titulo, descripcion, element.id, hora, fecha)
@@ -191,7 +209,6 @@ module.exports.cron = {
                                   });
 
                                   if (sumadepagos == element.valor) {
-                                    console.log("entra if")
 
                                     Contrato.update(element.id, {
                                       pagado: sumadepagos,
@@ -259,15 +276,7 @@ module.exports.cron = {
                           var finmenosuno = moment(fechafin).subtract(1, unidad).format("YYYY-MM-DD")
                           var now = moment().format("YYYY-MM-DD");
                           var diasParaPago = moment(proximopago).diff(now, 'days');
-                          console.log(diasParaPago)
-                          // restar dias
-                          //moment().subtract(7, 'days');
-                          //entre 
-                          //moment('2018-08-11').isBetween('2018-08-30', '2018-08-01');
-
-                          if (moment.ultimopago) {
-
-                          }
+                          
 
                           var sumadepagos = 0;
                           pago.forEach(pay => {
@@ -283,6 +292,8 @@ module.exports.cron = {
                           console.log(proximopago)
                           console.log("ultimopago")
                           console.log(ultimopago)
+                          console.log("pago[0].cuota")
+                          console.log(pago[0].cuota)
 
 
                           // si el ultimo pago es mayor a 30  o 360 dias de la fecha actul
@@ -291,8 +302,74 @@ module.exports.cron = {
                           if (moment(ultimopago).isBetween(finmenosuno, fechafin) && sumadepagos + element.pagado == element.valor) {
                             console.log("ya pago este men")
                             console.log("entra between")
+
+                            Estado.findOne({
+                              slug: "finalizado"
+                            }).exec((err, stade) => {
+                              if (err) {
+                                console.log("err")
+                              }
+                              if (!stade) {
+                                console.log("no estado")
+                              } else {
+                                Contrato.update(element.id, {
+                                  pagado: pago[0].monto,
+                                  cancelo: true,
+                                  estado: stade.id
+                                }).exec((err, contratoup) => {
+                                  if (err) {
+                                    return res.serverError(err);
+                                  }
+                                  if (!contratoup) {
+
+                                  } else {
+                                    titulo = "Contrato pagado y finalizado"
+                                    descripcion = 'EL pago del contrato a sido realizado satisfactoriamente ' + '\n' + 'con un valor de : ' + pago[0].monto + " El contrato de Compraventa se da por finalizado";
+                                    hora = moment().format('HH:mm');
+                                    fecha = moment().format('YYYY-MM-DD');
+                                    Servicio.crearMensaje(titulo, descripcion, element.id, hora, fecha)
+                                      .then((mensaje) => {
+                                        console.log(mensaje)
+                                      })
+                                  }
+                                })
+                              }
+                            })
+
+
                           } else if (moment(ultimopago).isBetween(finmenosuno, fechafin) && sumadepagos + element.pagado < element.valor) {
                             console.log("no ha pagado todo")
+                            diasParaPago = moment(fechafin).diff(now, 'days');
+
+                            if (diasParaPago * -1 > 0 && diasParaPago * -1 <= 60) {
+                              //// se calcula sobre el valor de la cuota
+
+                              valorAnterior = (element.valor - element.pagado) / contratoetiqueta.cantidadPeriodo;
+                              interes = (((valorAnterior) * 0.30) / 30) * (diasParaPago * -1);
+
+                              nuevoValorPago = valorAnterior + interes;
+
+
+                              titulo = "Se encuentra en mora el ultimo pago"
+                              descripcion = "El pago" + " está atrasado" + diasParaPago + "  días" + " El valor a pagar era de " + valorAnterior + ". El nuevo valor a pagar con intereses es de " + nuevoValorPago + "PESOS";
+                              hora = moment().format('HH:mm');
+                              fecha = now
+                              Servicio.crearMensaje(titulo, descripcion, element.id, hora, fecha)
+                                .then((mensaje) => {
+                                  console.log(mensaje)
+                                })
+                            } else if (diasParaPago * -1 > 60) {
+                              titulo = "Mora mayor a dos meses"
+                              descripcion = "El pago de la cuota" + "esta atrasado" + diasParaPago + '  días. ' + "El caso fue enviado a jurídica";
+                              hora = moment().format('HH:mm');
+                              fecha = now
+                              Servicio.crearMensaje(titulo, descripcion, element.id, hora, fecha)
+                                .then((mensaje) => {
+                                  console.log(mensaje)
+                                })
+                            }
+                            //enviar correo
+
                           } else if (moment(proximopago).isSame(now)) {
                             console.log("hoy dia de pago")
                             titulo = "Hoy, día de pago"
@@ -304,12 +381,18 @@ module.exports.cron = {
                                 console.log(mensaje)
                               })
                           } else if (moment(now).isAfter(proximopago)) {
-
+                            console.log("entra por aca")
                             if (diasParaPago * -1 > 0 && diasParaPago * -1 <= 60) {
-                              //calcular intereses
+                              //// se calcula sobre el valor de la cuota
+
+                              valorAnterior = (element.valor - element.pagado) / contratoetiqueta.cantidadPeriodo;
+                              interes = (((valorAnterior) * 0.30) / 30) * (diasParaPago * -1);
+
+                              nuevoValorPago = valorAnterior + interes;
+
 
                               titulo = "Se encuentra en mora"
-                              descripcion = "El pago de la cuota esta atrasado" + diasParaPago + '  días ';
+                              descripcion = "El pago" + " está atrasado" + diasParaPago + "  días" + " El valor a pagar era de " + valorAnterior + ". El nuevo valor a pagar con intereses es de " + nuevoValorPago + " PESOS";
                               hora = moment().format('HH:mm');
                               fecha = now
                               Servicio.crearMensaje(titulo, descripcion, element.id, hora, fecha)

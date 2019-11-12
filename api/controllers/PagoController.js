@@ -11,6 +11,7 @@ module.exports = {
             contrato: req.param('contrato'),
             fecha: req.param('fecha'),
             monto:req.param("monto"),
+            cuota:req.param("cuota"),
             tipo: req.param('tipo')
         }).then(function (pago) {
 
