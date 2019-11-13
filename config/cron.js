@@ -121,21 +121,30 @@ module.exports.cron = {
                               }
 
                               titulo = "Se encuentra en mora"
-                              descripcion = "El " + mensaje + " está atrasado" + diasParaPago + "  días" + " El valor a pagar era de " + valorAnterior + ". El nuevo valor a pagar con intereses es de " + nuevoValorPago + "PESOS";
+                              descripcion = "El " + mensaje + " está atrasado" + diasParaPago + "  días" + "<br>" + " El valor a pagar era de " + valorAnterior + "<br>" + " El nuevo valor a pagar con intereses es de " + nuevoValorPago + " PESOS";
                               hora = moment().format('HH:mm');
                               fecha = now
                               Servicio.crearMensaje(titulo, descripcion, element.id, hora, fecha)
                                 .then((mensaje) => {
+
                                   console.log(mensaje)
+
+                                  Servicio.actualizarContratoEtiqueta(element.id, nuevoValorPago).then((retorno) => {
+
+                                    console.log(retorno)
+                                  })
+
                                 })
                             } else if (diasParaPago * -1 > 60) {
                               titulo = "Mora mayor a dos meses"
-                              descripcion = "El " + mensaje + "está atrasado" + diasParaPago + '  días. ' + "El caso fue enviado a jurídica";
+                              descripcion = "El " + mensaje + "está atrasado" + diasParaPago + '  días. ' + "<br>" + "El caso fue enviado a jurídica";
                               hora = moment().format('HH:mm');
                               fecha = now
                               Servicio.crearMensaje(titulo, descripcion, element.id, hora, fecha)
                                 .then((mensaje) => {
                                   console.log(mensaje)
+
+
                                 })
                               //enviar email a juridica
 
@@ -145,7 +154,7 @@ module.exports.cron = {
 
                       } else { //ya con pagos
                         if (contratoetiqueta.descripcion == "En una fecha determinada posterior") {
-                          console.log("entra else posterior")
+                          console.log("entra else posterior fecha det ")
 
                           if (element.finalidad == "Compraventa") {
                             Estado.findOne({
@@ -158,7 +167,7 @@ module.exports.cron = {
                                 console.log("no estado")
                               } else {
                                 if (pago.length == 1) {
-                                  if (pago[0].monto == element.valor) {
+                                  if (pago[0].monto >= contratoetiqueta.valor) {
                                     console.log("entra if")
 
                                     Contrato.update(element.id, {
@@ -173,7 +182,7 @@ module.exports.cron = {
 
                                       } else {
                                         titulo = "Contrato pagado y finalizado"
-                                        descripcion = 'EL pago del contrato a sido realizado satisfactoriamente ' + '\n' + 'con un valor de : ' + pago[0].monto + " El contrato de Compraventa se da por finalizado";
+                                        descripcion = 'EL pago del contrato ha sido realizado satisfactoriamente ' + 'con un valor de : ' + pago[0].monto + "<br>" + "El contrato de Compraventa se da por finalizado";
                                         hora = moment().format('HH:mm');
                                         fecha = moment().format('YYYY-MM-DD');
                                         Servicio.crearMensaje(titulo, descripcion, element.id, hora, fecha)
@@ -182,10 +191,10 @@ module.exports.cron = {
                                           })
                                       }
                                     })
-                                  } else if (pago[0].monto < element.valor) {
+                                  } else if (pago[0].monto < contratoetiqueta.valor) {
 
                                     titulo = "EL pago realizado para el contrato es menor a la deuda"
-                                    descripcion = 'EL pago realizado es menor a la deuda ' + '\n' + 'Pago : ' + pago[0].monto + '\n' + 'Deuda : ' + element.valor
+                                    descripcion = 'EL pago realizado es menor a la deuda ' + '<br>' + 'Pago : ' + pago[0].monto + '<br>' + 'Deuda : ' + contratoetiqueta.valor
                                     hora = moment().format('HH:mm');
                                     fecha = moment().format('YYYY-MM-DD');
                                     Servicio.crearMensaje(titulo, descripcion, element.id, hora, fecha)
@@ -203,12 +212,13 @@ module.exports.cron = {
                                     })
                                   }
                                 } else {
+                                  console.log("entra else mas pagos")
                                   var sumadepagos = 0;
                                   pago.forEach(element => {
                                     sumadepagos += element.monto;
                                   });
 
-                                  if (sumadepagos == element.valor) {
+                                  if (sumadepagos >= contratoetiqueta.valor) {
 
                                     Contrato.update(element.id, {
                                       pagado: sumadepagos,
@@ -222,7 +232,7 @@ module.exports.cron = {
 
                                       } else {
                                         titulo = "Contrato pagado y finalizado"
-                                        descripcion = 'EL pago del contrato a sido realizado satisfactoriamente ' + '\n' + 'con un valor de : ' + sumadepagos + " El contrato de Compraventa se da por finalizado";
+                                        descripcion = 'EL pago del contrato ha sido realizado satisfactoriamente ' + 'con un valor total de : ' + sumadepagos + "<br>" + " El contrato de Compraventa se da por finalizado";
                                         hora = moment().format('HH:mm');
                                         fecha = moment().format('YYYY-MM-DD');
                                         Servicio.crearMensaje(titulo, descripcion, element.id, hora, fecha)
@@ -231,10 +241,10 @@ module.exports.cron = {
                                           })
                                       }
                                     })
-                                  } else if (sumadepagos < element.valor) {
+                                  } else if (sumadepagos < contratoetiqueta.valor) {
 
                                     titulo = "EL pago realizado para el contrato es menor a la deuda"
-                                    descripcion = 'EL pago realizado es menor a la deuda ' + '\n' + 'Pago : ' + sumadepagos + '\n' + 'Deuda : ' + element.valor
+                                    descripcion = 'EL pago realizado es menor a la deuda ' + '<br>' + 'Pago : ' + sumadepagos + '<br>' + 'Deuda : ' + contratoetiqueta.valor
                                     hora = moment().format('HH:mm');
                                     fecha = moment().format('YYYY-MM-DD');
                                     Servicio.crearMensaje(titulo, descripcion, element.id, hora, fecha)
@@ -276,7 +286,7 @@ module.exports.cron = {
                           var finmenosuno = moment(fechafin).subtract(1, unidad).format("YYYY-MM-DD")
                           var now = moment().format("YYYY-MM-DD");
                           var diasParaPago = moment(proximopago).diff(now, 'days');
-                          
+
 
                           var sumadepagos = 0;
                           pago.forEach(pay => {
@@ -284,24 +294,9 @@ module.exports.cron = {
                           });
 
                           var valorcuota = (element.valor - element.pagado) / parseInt(contratoetiqueta.cantidadPeriodo);
-                          console.log("valorcuota")
-                          console.log(valorcuota)
-                          console.log("diasParaPago")
-                          console.log(diasParaPago)
-                          console.log("proximopago")
-                          console.log(proximopago)
-                          console.log("ultimopago")
-                          console.log(ultimopago)
-                          console.log("pago[0].cuota")
-                          console.log(pago[0].cuota)
 
 
-                          // si el ultimo pago es mayor a 30  o 360 dias de la fecha actul
-
-
-                          if (moment(ultimopago).isBetween(finmenosuno, fechafin) && sumadepagos + element.pagado == element.valor) {
-                            console.log("ya pago este men")
-                            console.log("entra between")
+                          if (moment(ultimopago).isBetween(finmenosuno, fechafin) && sumadepagos + element.pagado >= element.valor) {
 
                             Estado.findOne({
                               slug: "finalizado"
@@ -324,7 +319,7 @@ module.exports.cron = {
 
                                   } else {
                                     titulo = "Contrato pagado y finalizado"
-                                    descripcion = 'EL pago del contrato a sido realizado satisfactoriamente ' + '\n' + 'con un valor de : ' + pago[0].monto + " El contrato de Compraventa se da por finalizado";
+                                    descripcion = 'EL pago del contrato ha sido realizado satisfactoriamente ' + '\n' + 'con un valor de : ' + pago[0].monto + " El contrato de Compraventa se da por finalizado";
                                     hora = moment().format('HH:mm');
                                     fecha = moment().format('YYYY-MM-DD');
                                     Servicio.crearMensaje(titulo, descripcion, element.id, hora, fecha)
@@ -357,6 +352,10 @@ module.exports.cron = {
                               Servicio.crearMensaje(titulo, descripcion, element.id, hora, fecha)
                                 .then((mensaje) => {
                                   console.log(mensaje)
+                                  Servicio.actualizarContratoEtiqueta(element.id, nuevoValorPago).then((retorno) => {
+
+                                    console.log(retorno)
+                                  })
                                 })
                             } else if (diasParaPago * -1 > 60) {
                               titulo = "Mora mayor a dos meses"
@@ -398,6 +397,10 @@ module.exports.cron = {
                               Servicio.crearMensaje(titulo, descripcion, element.id, hora, fecha)
                                 .then((mensaje) => {
                                   console.log(mensaje)
+                                  Servicio.actualizarContratoEtiqueta(element.id, nuevoValorPago).then((retorno) => {
+
+                                    console.log(retorno)
+                                  })
                                 })
                             } else if (diasParaPago * -1 > 60) {
                               titulo = "Mora mayor a dos meses"
@@ -420,8 +423,61 @@ module.exports.cron = {
                               .then((mensaje) => {
                                 console.log(mensaje)
                               })
-                          }
+                          } else if (sumadepagos >= element.valor && moment(fechafin).isAfter(ultimopago)) {
+                            console.log("pagado")
 
+                            Estado.findOne({
+                              slug: "finalizado"
+                            }).exec((err, stade) => {
+                              if (err) {
+                                console.log("err")
+                              }
+                              if (!stade) {
+                                console.log("no estado")
+                              } else {
+
+                                titulo = "Contrato pagado y finalizado"
+                                descripcion = 'EL pago del contrato ha sido realizado satisfactoriamente ' + 'con un valor de : ' + sumadepagos + "<br>" + "El contrato de Compraventa se da por finalizado";
+                                hora = moment().format('HH:mm');
+                                fecha = moment().format('YYYY-MM-DD');
+                                Servicio.crearMensaje(titulo, descripcion, element.id, hora, fecha)
+                                  .then((mensaje) => {
+                                    console.log(mensaje)
+                                    Contrato.update(element.id, {
+                                      pagado: pago[0].monto,
+                                      cancelo: true,
+                                      estado: stade.id
+                                    }).exec((err, contratoup) => {
+                                      if (err) {
+                                        return res.serverError(err);
+                                      }
+                                      if (!contratoup) {
+
+                                      } else {
+                                        console.log(contratoup)
+                                      }
+                                    })
+                                  })
+                              }
+                            })
+                          } else if (pago[0].monto < contratoetiqueta.valor) {
+                            titulo = "EL pago menor a la cuota"
+                            descripcion = 'EL pago realizado es menor a la deuda ' + '<br>' + 'Pago : ' + pago[0].monto + '<br>' + 'Deuda : ' + contratoetiqueta.valor
+                            hora = moment().format('HH:mm');
+                            fecha = moment().format('YYYY-MM-DD');
+                            Servicio.crearMensaje(titulo, descripcion, element.id, hora, fecha)
+                              .then((mensaje) => {
+                                console.log(mensaje)
+                              })
+
+                          } else if (pago[0].monto == contratoetiqueta.valor) {
+                            
+                            nuevoValorPago = (element.valor - element.pagado) / contratoetiqueta.cantidadPeriodo
+                            Servicio.actualizarContratoEtiqueta(element.id, nuevoValorPago).then((retorno) => {
+                              
+                              console.log(nuevoValorPago)
+                            })
+                          } 
                         }
                       }
                     })

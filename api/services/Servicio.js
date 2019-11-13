@@ -3,8 +3,8 @@ module.exports = {
   findArticulo: function funget(busqueda) {
     var ff = new Promise((rej, res) => {
       Articulo.find({
-        id:busqueda
-      })
+          id: busqueda
+        })
         .then(function (variables) {
           if (!variables || variables.length == 0) {
             rej({
@@ -249,7 +249,7 @@ module.exports = {
           ContratoUsuario.create({
               contrato: contrato,
               usuario: iduser,
-              rol: rolb.id              
+              rol: rolb.id
             })
             .then(function (contratoUsuario) {
               return rej({
@@ -335,6 +335,32 @@ module.exports = {
             success: true,
             massage: "Creado Correctamente ",
             data: mensaje
+          });
+        })
+        .catch(err => {
+          return rej({
+            success: true,
+            massage: "Error crear mensaje ",
+            'err': err
+          });
+        });
+    })
+    return ff
+  },
+
+  actualizarContratoEtiqueta: function (contrato, valor) {
+    var ff = new Promise((rej, res) => {
+      ContratoEtiqueta.update({
+          contrato: contrato,
+          titulo: 'Precio'
+        }, {
+          valor: valor
+        })
+        .then(function (cone) {
+          return rej({
+            success: true,
+            massage: "Creado Correctamente ",
+            data: cone
           });
         })
         .catch(err => {
