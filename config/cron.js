@@ -8,12 +8,27 @@ var hora = "";
 var inicio = "";
 var fechapago = "";
 var mensaje = "";
+
+
+let nodemailer = require('nodemailer');
+
+//email
+ let transporter = nodemailer.createTransport("smtp://smtp.ethereal.email",{
+    host: 'smtp.ethereal.email',
+    port: 587,
+    auth: {
+        user: 'sam.harvey4@ethereal.email',
+        pass: 'PrfnNKz3Ag3BgaSNTS'
+    }
+  });
+
+
 module.exports.cron = {
 
 
   myFirstJob: {
-    schedule: '6 8 * * * *',
-    //schedule: '* * * * * *',
+    //schedule: '6 8 * * * *',
+    schedule: '6 */20 * * * *',
     onTick: function () {
 
       Contrato.find()
@@ -143,10 +158,28 @@ module.exports.cron = {
                               Servicio.crearMensaje(titulo, descripcion, element.id, hora, fecha)
                                 .then((mensaje) => {
                                   console.log(mensaje)
+                                  
+                                  // email
 
+                        
+                                  let mailOptions = {
+                                    from: "nombreEmpresa@gmail.com",
+                                    to: "juridicaEmpresa@gmail.com",
+                                    subject: `Mora mayor a dos meses`,
+                                    text:"El contrato "+ element.observaciones +"ha sobrepasado el limite de mora"
+                                  };
+                                  transporter.sendMail(mailOptions, function (error, info) {
+                                    if (error) {
+                                      console.log(error)
+                                      throw error;
+                                     
+                                    } else {
+                                      console.log("Email successfully sent!");
+                                      console.log(info)
+                                    }
+                                  });
 
                                 })
-                              //enviar email a juridica
 
                             }
                           }
@@ -410,8 +443,28 @@ module.exports.cron = {
                               Servicio.crearMensaje(titulo, descripcion, element.id, hora, fecha)
                                 .then((mensaje) => {
                                   console.log(mensaje)
+
+                                  //enviar email a juridica
+
+                                  let mailOptions = {
+                                    from: "nombreEmpresa@gmail.com",
+                                    to: "juridicaEmpresa@gmail.com",
+                                    subject: `Mora mayor a dos meses`,
+                                    text:"El contrato "+ element.observaciones +"ha sobrepasado el limite de mora"
+                                  };
+                                  transporter.sendMail(mailOptions, function (error, info) {
+                                    if (error) {
+                                      console.log(error)
+                                      throw error;
+                                     
+                                    } else {
+                                      console.log("Email successfully sent!");
+                                      console.log(info)
+                                    }
+                                  });
+
                                 })
-                              //enviar email a juridica
+                              
 
                             }
                           } else if (diasParaPago > 0 && diasParaPago <= 3) {
@@ -471,13 +524,13 @@ module.exports.cron = {
                               })
 
                           } else if (pago[0].monto == contratoetiqueta.valor) {
-                            
+
                             nuevoValorPago = (element.valor - element.pagado) / contratoetiqueta.cantidadPeriodo
                             Servicio.actualizarContratoEtiqueta(element.id, nuevoValorPago).then((retorno) => {
-                              
+
                               console.log(nuevoValorPago)
                             })
-                          } 
+                          }
                         }
                       }
                     })
@@ -487,6 +540,11 @@ module.exports.cron = {
             });
           }
         })
-    }
+        // sails.log('antes de moriri \n')
+        // sails.log(sails.hooks.cron.jobs.myFirstJob)
+        // sails.hooks.cron.jobs.myFirstJob.stop();
+        // sails.log('despues de de moriri \n')
+        // sails.log(sails.hooks.cron.jobs.myFirstJob)
+      }
   }
 };
