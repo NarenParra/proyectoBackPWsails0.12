@@ -28,7 +28,7 @@ module.exports.cron = {
 
   myFirstJob: {
     //schedule: '6 8 * * * *',
-    schedule: '6 */20 * * * *',
+    schedule: '6 */55 * * * *',
     onTick: function () {
 
       Contrato.find()
