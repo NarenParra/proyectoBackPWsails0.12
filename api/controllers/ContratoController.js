@@ -183,10 +183,6 @@ module.exports = {
         slug: req.param("estado")
       })
       .then((estado) => {
-        //sails.log.debug(estado.id)
-        //console.log('entra update')
-        // sails.log.debug(req.param('id'))
-        // console.log(req.param('id'))
 
         Contrato.update(req.param('id'), {
             estado: estado.id,
@@ -203,12 +199,13 @@ module.exports = {
           })
           .then(function (contrato) {
             // update comprador
+            console.log('entra then')
             if (req.param('uservend')) {
               Usuario.findOne({
                   docid: req.param('uservend')
                 })
                 .then(function (usuario) {
-
+                  console.log("entra vendedor")
                   Rol.findOne({
                       slug: 'vendedor'
                     })
@@ -232,7 +229,7 @@ module.exports = {
                   docid: req.param('usercomp')
                 })
                 .then(function (usuario) {
-
+                  
                   Contrato.update(req.param('id'), {
                     usuario: usuario.id
                   }).then(function (vari) {
