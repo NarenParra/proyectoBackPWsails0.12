@@ -8,7 +8,7 @@
 module.exports = {
 
   get: function (req, res) {
-
+    //respnde contratos dependiendo el estado
     Estado.findOne({
         slug: req.param("estado")
       })
@@ -68,9 +68,6 @@ module.exports = {
         slug: req.param("estado")
       })
       .then((estado) => {
-
-
-        // sails.log.debug(req.param("userlog"));
         Usuario.findOne({
           docid: req.param("userlog")
         }).then((usuariolog) => {
@@ -99,6 +96,7 @@ module.exports = {
                   finalidad: req.param('finalidad')
                 })
                 .then(function (contrato) {
+                  //registro de contrato etiqueta
                   Servicio.crearContratoEtiqueta(req.param('slugObj'), contrato.id, 0, "", "", 0, "", "")
                     .then(function (fce) {
 
@@ -121,7 +119,7 @@ module.exports = {
                         })
                     })
                     .then(function (ff) {
-
+                      //registro de contrato usuario comprador
                       Servicio.crearContratoUsuario(usuariocom, contrato.id, "comprador")
                         .then(function (fce) {
                           //res.send(fce)
@@ -131,14 +129,12 @@ module.exports = {
                       Usuario.findOne({
                         docid: req.param("uservend")
                       }).then((usuariovend) => {
-                        //sails.log.debug(usuariovend)
-
+                        //registro de contrato usuario vendedor
                         Servicio.crearContratoUsuario(usuariovend, contrato.id, "vendedor")
                           .then(function (fce) {
                             // sails.log.debug(res.send(fce))
                             res.send(fce)
                           })
-
                       })
                     })
                     .catch(function (err) {
@@ -198,7 +194,7 @@ module.exports = {
             finalidad: req.param('finalidad')
           })
           .then(function (contrato) {
-            // update comprador
+            // update vendedor
             console.log('entra then')
             if (req.param('uservend')) {
               Usuario.findOne({
@@ -222,7 +218,7 @@ module.exports = {
                     })
                 })
             }
-            // update vendedor
+            // update  comprador
             if (req.param('usercomp')) {
 
               Usuario.findOne({
@@ -250,7 +246,7 @@ module.exports = {
                   })
                 })
             }
-
+            //actualiza contrato etiqueta
             ContratoEtiqueta.find({
                 contrato: req.param("id")
               })

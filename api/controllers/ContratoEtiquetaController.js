@@ -28,7 +28,6 @@ module.exports = {
             var parametros = req.allParams();
             sails.log.debug(parametros);
             if (typeof etiqueta == 'object') {
-              //sails.log.debug(req.param("titulo"), estado.id);
               parametros.etiqueta = etiqueta.id;
               sails.log.debug(parametros);
               ContratoEtiqueta.create(parametros)
