@@ -8,8 +8,6 @@
 module.exports = {
   tableName: "contrato",
   attributes: {
-    //contrato
-    // agregar descripccion y tipo(Compraventa)
     estado: {
       model: "estado"
     },
@@ -43,7 +41,6 @@ module.exports = {
     contratociudad: {
       type: "string"
     }
-
     // fechatermina:"date"
   },
   connection: "mongodb",

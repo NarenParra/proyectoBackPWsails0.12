@@ -15,7 +15,7 @@ module.exports = {
     },
     descripcion: {
       type: "string"
-    },
+    }, 
     valorDescripcion: {
       type: "string"
     },
@@ -28,6 +28,7 @@ module.exports = {
     etiqueta: {
       model: "etiqueta"
     },
+    // guarda el acumulado de los pagos
     valor: {
       type: "float"
     },
