@@ -363,5 +363,68 @@ module.exports = {
           err: err
         });
       });
+  },
+
+  delete: function(req, res) {
+    Contrato.destroy({
+      id: req.param("idc")
+    }).exec((err, contrato) => {
+      if (err) {
+        res.serverError(err);
+      }
+      if (contrato.length == 0) {
+        return res.send({
+          success: false,
+          massage: "no hay contrato "
+        });
+      } else {
+        ContratoEtiqueta.destroy({
+          contrato: req.param("idc")
+        }).exec((err, contratoetiqueta) => {
+          if (err) {
+            res.serverError(err);
+          }
+          if (contratoetiqueta.length == 0) {
+            return res.send({
+              success: false,
+              massage: "no hay contratoetiqueta "
+            });
+          } else {
+            ContratoUsuario.destroy({
+              contrato: req.param("idc")
+            }).exec((err, contratousuario) => {
+              if (err) {
+                res.serverError(err);
+              }
+              if (contratousuario.length == 0) {
+                return res.send({
+                  success: false,
+                  massage: "no hay contratousuario "
+                });
+              } else {
+                ContratoArticulo.destroy({
+                  contrato: req.param("idc")
+                }).exec((err, contratoetiquet) => {
+                  if (err) {
+                    res.serverError(err);
+                  }
+                  if (contratoetiquet.length == 0) {
+                    return res.send({
+                      success: false,
+                      massage: "Contrato Eliminado "
+                    });
+                  } else {
+                    return res.send({
+                      success: true,
+                      massage: "Contrato Eliminado "
+                    });
+                  }
+                });
+              }
+            });
+          }
+        });
+      }
+    });
   }
 };

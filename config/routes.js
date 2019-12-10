@@ -49,6 +49,7 @@ module.exports.routes = {
   'GET /api/contrato/otra' :'ContratoController.obtener',
   'POST /api/contrato' : 'ContratoController.create',
   'PUT /api/contrato/:id' : 'ContratoController.update',
+  'DELETE /api/contrato/:id' : 'ContratoController.delete',
   'GET /api/test' :'TestController.get',
   'POST /api/contratoEtiqueta' : 'ContratoEtiquetaController.create',
   'GET /api/contratoEtiqueta' : 'ContratoEtiquetaController.get',
