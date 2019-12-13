@@ -32,6 +32,7 @@ module.exports = {
     valor: {
       type: "float"
     },
+    //acumulado de los pagos
     pagado: {
       type: "float"
     },

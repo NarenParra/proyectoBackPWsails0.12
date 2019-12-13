@@ -23,7 +23,7 @@ let transporter = nodemailer.createTransport("smtp://smtp.ethereal.email", {
 
 module.exports.cron = {
   myFirstJob: {
-    schedule: "6 37 13 * * *",
+    schedule: "6  14 * * *",
     //schedule: '6 */55 * * * *',
     onTick: function() {
       Contrato.find()
@@ -60,14 +60,13 @@ module.exports.cron = {
                         //si no hay pagos
                         if (pago.length == 0) {
                           console.log("entra no pago");
-                          console.log(contratoetiqueta.descripcion);
 
                           if (
                             contratoetiqueta.descripcion ==
                               "En una fecha determinada posterior" ||
                             contratoetiqueta.descripcion == "De forma periodica"
                           ) {
-                            console.log("entra if");
+                            console.log("entra if no pago 1");
                             var unidad = "";
                             if (contratoetiqueta.unidadPeriodo == "Días") {
                               unidad = "days";
@@ -117,38 +116,52 @@ module.exports.cron = {
                             var valorAnterior = 0;
                             console.log(diasParaPago);
                             if (diasParaPago > 0 && diasParaPago <= 3) {
-                              titulo =
-                                "Faltan pocos días para realizar el pago";
-                              descripcion =
-                                "EL contrato se debe pagar pronto, faltan " +
-                                diasParaPago +
-                                " días para el " +
-                                mensaje;
-                              hora = moment().format("HH:mm");
-                              fecha = now;
-                              Servicio.crearMensaje(
-                                titulo,
-                                descripcion,
-                                element.id,
-                                hora,
-                                fecha
-                              ).then(mensaje => {
-                                console.log(mensaje);
-                              });
+                              let message = {
+                                titulo:
+                                  "Faltan pocos días para realizar el pago",
+                                descripcion:
+                                  "EL contrato se debe pagar pronto, faltan " +
+                                  diasParaPago +
+                                  " días para el " +
+                                  mensaje,
+                                hora: moment().format("HH:mm"),
+                                fecha: now,
+                                contrato: element.id
+                              };
+
+                              sails.request(
+                                "POST http://localhost:1337/api/mensaje",
+                                message,
+                                function(err, response, body) {
+                                  if (err) {
+                                    sails.log.debug(err);
+                                  }
+                                  if (!body.success) {
+                                    sails.log.debug("error en el registro");
+                                  }
+                                }
+                              );
                             } else if (moment(now).isSame(fechapago)) {
-                              titulo = "Hoy, día de pago";
-                              descripcion = "Flatan 0 dias para el" + mensaje;
-                              hora = moment().format("HH:mm");
-                              fecha = now;
-                              Servicio.crearMensaje(
-                                titulo,
-                                descripcion,
-                                element.id,
-                                hora,
-                                fecha
-                              ).then(mensaje => {
-                                console.log(mensaje);
-                              });
+                              let message = {
+                                titulo: "Hoy, día de pago",
+                                descripcion: "Flatan 0 dias para el" + mensaje,
+                                hora: moment().format("HH:mm"),
+                                fecha: now,
+                                contrato: element.id
+                              };
+
+                              sails.request(
+                                "POST http://localhost:1337/api/mensaje",
+                                message,
+                                function(err, response, body) {
+                                  if (err) {
+                                    sails.log.debug(err);
+                                  }
+                                  if (!body.success) {
+                                    sails.log.debug("error en el registro");
+                                  }
+                                }
+                              );
                             } else if (moment(now).isAfter(fechapago)) {
                               console.log("entra after");
                               console.log(diasParaPago);
@@ -186,83 +199,98 @@ module.exports.cron = {
                                   console.log("periodica");
                                 }
 
-                                titulo = "Se encuentra en mora";
-                                descripcion =
-                                  "El " +
-                                  mensaje +
-                                  " está atrasado" +
-                                  diasParaPago +
-                                  "  días" +
-                                  "<br>" +
-                                  " El valor a pagar era de " +
-                                  valorAnterior +
-                                  "<br>" +
-                                  " El nuevo valor a pagar con intereses es de " +
-                                  nuevoValorPago +
-                                  " PESOS";
-                                hora = moment().format("HH:mm");
-                                fecha = now;
-                                Servicio.crearMensaje(
-                                  titulo,
-                                  descripcion,
-                                  element.id,
-                                  hora,
-                                  fecha
-                                ).then(mensaje => {
-                                  console.log(mensaje);
+                                let message = {
+                                  titulo: "Se encuentra en mora",
+                                  descripcion:
+                                    "El " +
+                                    mensaje +
+                                    " está atrasado" +
+                                    diasParaPago +
+                                    "  días" +
+                                    "<br>" +
+                                    " El valor a pagar era de " +
+                                    valorAnterior +
+                                    "<br>" +
+                                    " El nuevo valor a pagar con intereses es de " +
+                                    nuevoValorPago +
+                                    " PESOS",
+                                  hora: moment().format("HH:mm"),
+                                  fecha: now,
+                                  contrato: element.id
+                                };
 
-                                  Servicio.actualizarContratoEtiqueta(
-                                    element.id,
-                                    nuevoValorPago
-                                  ).then(retorno => {
-                                    console.log(retorno);
-                                  });
-                                });
-                              } else if (diasParaPago * -1 > 60) {
-                                titulo = "Mora mayor a dos meses";
-                                descripcion =
-                                  "El " +
-                                  mensaje +
-                                  "está atrasado" +
-                                  diasParaPago +
-                                  "  días. " +
-                                  "<br>" +
-                                  "El caso fue enviado a jurídica";
-                                hora = moment().format("HH:mm");
-                                fecha = now;
-                                Servicio.crearMensaje(
-                                  titulo,
-                                  descripcion,
-                                  element.id,
-                                  hora,
-                                  fecha
-                                ).then(mensaje => {
-                                  console.log(mensaje);
-
-                                  // email
-
-                                  let mailOptions = {
-                                    from: "nombreEmpresa@gmail.com",
-                                    to: "juridicaEmpresa@gmail.com",
-                                    subject: `Mora mayor a dos meses`,
-                                    text:
-                                      "El contrato " +
-                                      element.observaciones +
-                                      "ha sobrepasado el limite de mora"
-                                  };
-                                  transporter.sendMail(mailOptions, function(
-                                    error,
-                                    info
-                                  ) {
-                                    if (error) {
-                                      console.log(error);
-                                      throw error;
-                                    } else {
-                                      console.log("Email successfully sent!");
-                                      console.log(info);
+                                sails.request(
+                                  "POST http://localhost:1337/api/mensaje",
+                                  message,
+                                  function(err, response, body) {
+                                    if (err) {
+                                      sails.log.debug(err);
                                     }
-                                  });
-                                });
+                                    if (!body.success) {
+                                      sails.log.debug("error en el registro");
+                                    } else {
+                                      Servicio.actualizarContratoEtiqueta(
+                                        element.id,
+                                        nuevoValorPago
+                                      ).then(retorno => {
+                                        console.log(retorno);
+                                      });
+                                    }
+                                  }
+                                );
+                              } else if (diasParaPago * -1 > 60) {
+                                let message = {
+                                  titulo: "Mora mayor a dos meses",
+                                  descripcion:
+                                    "El " +
+                                    mensaje +
+                                    "está atrasado" +
+                                    diasParaPago +
+                                    "  días. " +
+                                    "<br>" +
+                                    "El caso fue enviado a jurídica",
+                                  hora: moment().format("HH:mm"),
+                                  fecha: now,
+                                  contrato: element.id
+                                };
+
+                                sails.request(
+                                  "POST http://localhost:1337/api/mensaje",
+                                  message,
+                                  function(err, response, body) {
+                                    if (err) {
+                                      sails.log.debug(err);
+                                    }
+                                    if (!body.success) {
+                                      sails.log.debug("error en el registro");
+                                    } else {
+                                      //email
+                                      let mailOptions = {
+                                        from: "nombreEmpresa@gmail.com",
+                                        to: "juridicaEmpresa@gmail.com",
+                                        subject: `Mora mayor a dos meses`,
+                                        text:
+                                          "El contrato " +
+                                          element.observaciones +
+                                          "ha sobrepasado el limite de mora"
+                                      };
+                                      transporter.sendMail(
+                                        mailOptions,
+                                        function(error, info) {
+                                          if (error) {
+                                            console.log(error);
+                                            throw error;
+                                          } else {
+                                            console.log(
+                                              "Email successfully sent!"
+                                            );
+                                            console.log(info);
+                                          }
+                                        }
+                                      );
+                                    }
+                                  }
+                                );
                               }
                             }
                           }
@@ -288,8 +316,6 @@ module.exports.cron = {
                                     if (
                                       pago[0].monto >= contratoetiqueta.valor
                                     ) {
-                                      console.log("entra if");
-
                                       Contrato.update(element.id, {
                                         pagado: pago[0].monto,
                                         cancelo: true,
@@ -300,62 +326,82 @@ module.exports.cron = {
                                         }
                                         if (!contratoup) {
                                         } else {
-                                          titulo =
-                                            "Contrato pagado y finalizado";
-                                          descripcion =
-                                            "EL pago del contrato ha sido realizado satisfactoriamente " +
-                                            "con un valor de : " +
-                                            pago[0].monto +
-                                            "<br>" +
-                                            "El contrato de Compraventa se da por finalizado";
-                                          hora = moment().format("HH:mm");
-                                          fecha = moment().format("YYYY-MM-DD");
-                                          Servicio.crearMensaje(
-                                            titulo,
-                                            descripcion,
-                                            element.id,
-                                            hora,
-                                            fecha
-                                          ).then(mensaje => {
-                                            console.log(mensaje);
-                                          });
+                                          let message = {
+                                            titulo:
+                                              "Contrato pagado y finalizado",
+                                            descripcion:
+                                              "EL pago del contrato ha sido realizado satisfactoriamente " +
+                                              "con un valor de : " +
+                                              pago[0].monto +
+                                              "<br>" +
+                                              "El contrato de Compraventa se da por finalizado",
+                                            hora: moment().format("HH:mm"),
+                                            fecha: moment().format(
+                                              "YYYY-MM-DD"
+                                            ),
+                                            contrato: element.id
+                                          };
+                                          sails.request(
+                                            "POST http://localhost:1337/api/mensaje",
+                                            message,
+                                            function(err, response, body) {
+                                              if (err) {
+                                                sails.log.debug(err);
+                                              }
+                                              if (!body.success) {
+                                                sails.log.debug(
+                                                  "error en el registro"
+                                                );
+                                              }
+                                            }
+                                          );
                                         }
                                       });
                                     } else if (
                                       pago[0].monto < contratoetiqueta.valor
                                     ) {
-                                      titulo =
-                                        "EL pago realizado para el contrato es menor a la deuda";
-                                      descripcion =
-                                        "EL pago realizado es menor a la deuda " +
-                                        "<br>" +
-                                        "Pago : " +
-                                        pago[0].monto +
-                                        "<br>" +
-                                        "Deuda : " +
-                                        contratoetiqueta.valor;
-                                      hora = moment().format("HH:mm");
-                                      fecha = moment().format("YYYY-MM-DD");
-                                      Servicio.crearMensaje(
-                                        titulo,
-                                        descripcion,
-                                        element.id,
-                                        hora,
-                                        fecha
-                                      ).then(mensaje => {
-                                        console.log(mensaje);
-                                      });
+                                      let message = {
+                                        titulo:
+                                          "EL pago realizado para el contrato es menor a la deuda",
+                                        descripcion:
+                                          "EL pago realizado es menor a la deuda " +
+                                          "<br>" +
+                                          "Pago : " +
+                                          pago[0].monto +
+                                          "<br>" +
+                                          "Deuda : " +
+                                          contratoetiqueta.valor,
+                                        hora: moment().format("HH:mm"),
+                                        fecha: moment().format("YYYY-MM-DD"),
+                                        contrato: element.id
+                                      };
 
-                                      Contrato.update(element.id, {
-                                        pagado: pago[0].monto,
-                                        cancelo: false
-                                      }).exec((err, contratoup) => {
-                                        if (err) {
-                                          return res.serverError(err);
+                                      sails.request(
+                                        "POST http://localhost:1337/api/mensaje",
+                                        message,
+                                        function(err, response, body) {
+                                          if (err) {
+                                            sails.log.debug(err);
+                                          }
+                                          if (!body.success) {
+                                            sails.log.debug(
+                                              "error en el registro"
+                                            );
+                                          } else {
+                                            Contrato.update(element.id, {
+                                              pagado: pago[0].monto,
+                                              cancelo: false
+                                            }).exec((err, contratoup) => {
+                                              if (err) {
+                                                return res.serverError(err);
+                                              }
+                                            });
+                                          }
                                         }
-                                      });
+                                      );
                                     }
                                   } else {
+                                    // si la suma de los pagos es igual a la deuda
                                     console.log("entra else mas pagos");
                                     var sumadepagos = 0;
                                     pago.forEach(element => {
@@ -373,51 +419,71 @@ module.exports.cron = {
                                         }
                                         if (!contratoup) {
                                         } else {
-                                          titulo =
-                                            "Contrato pagado y finalizado";
-                                          descripcion =
-                                            "EL pago del contrato ha sido realizado satisfactoriamente " +
-                                            "con un valor total de : " +
-                                            sumadepagos +
-                                            "<br>" +
-                                            " El contrato de Compraventa se da por finalizado";
-                                          hora = moment().format("HH:mm");
-                                          fecha = moment().format("YYYY-MM-DD");
-                                          Servicio.crearMensaje(
-                                            titulo,
-                                            descripcion,
-                                            element.id,
-                                            hora,
-                                            fecha
-                                          ).then(mensaje => {
-                                            console.log(mensaje);
-                                          });
+                                          let message = {
+                                            titulo:
+                                              "Contrato pagado y finalizado",
+                                            descripcion:
+                                              "EL pago del contrato ha sido realizado satisfactoriamente " +
+                                              "con un valor total de : " +
+                                              sumadepagos +
+                                              "<br>" +
+                                              " El contrato de Compraventa se da por finalizado",
+                                            hora: moment().format("HH:mm"),
+                                            fecha: moment().format(
+                                              "YYYY-MM-DD"
+                                            ),
+                                            contrato: element.id
+                                          };
+
+                                          sails.request(
+                                            "POST http://localhost:1337/api/mensaje",
+                                            message,
+                                            function(err, response, body) {
+                                              if (err) {
+                                                sails.log.debug(err);
+                                              }
+                                              if (!body.success) {
+                                                sails.log.debug(
+                                                  "error en el registro"
+                                                );
+                                              }
+                                            }
+                                          );
                                         }
                                       });
                                     } else if (
+                                      // si la suma de pagos es menor a la deuda
                                       sumadepagos < contratoetiqueta.valor
                                     ) {
-                                      titulo =
-                                        "EL pago realizado para el contrato es menor a la deuda";
-                                      descripcion =
-                                        "EL pago realizado es menor a la deuda " +
-                                        "<br>" +
-                                        "Pago : " +
-                                        sumadepagos +
-                                        "<br>" +
-                                        "Deuda : " +
-                                        contratoetiqueta.valor;
-                                      hora = moment().format("HH:mm");
-                                      fecha = moment().format("YYYY-MM-DD");
-                                      Servicio.crearMensaje(
-                                        titulo,
-                                        descripcion,
-                                        element.id,
-                                        hora,
-                                        fecha
-                                      ).then(mensaje => {
-                                        console.log(mensaje);
-                                      });
+                                      message = {
+                                        titulo:
+                                          "EL pago realizado para el contrato es menor a la deuda",
+                                        descripcion:
+                                          "EL pago realizado es menor a la deuda " +
+                                          "<br>" +
+                                          "Pago : " +
+                                          sumadepagos +
+                                          "<br>" +
+                                          "Deuda : " +
+                                          contratoetiqueta.valor,
+                                        hora: moment().format("HH:mm"),
+                                        fecha: moment().format("YYYY-MM-DD"),
+                                        contrato: element.id
+                                      };
+                                      sails.request(
+                                        "POST http://localhost:1337/api/mensaje",
+                                        message,
+                                        function(err, response, body) {
+                                          if (err) {
+                                            sails.log.debug(err);
+                                          }
+                                          if (!body.success) {
+                                            sails.log.debug(
+                                              "error en el registro"
+                                            );
+                                          }
+                                        }
+                                      );
 
                                       Contrato.update(element.id, {
                                         pagado: sumadepagos,
@@ -433,6 +499,7 @@ module.exports.cron = {
                               });
                             }
                           } else if (
+                            // para pagos de forma periodica
                             contratoetiqueta.descripcion == "De forma periodica"
                           ) {
                             if (contratoetiqueta.unidadPeriodo == "Días") {
@@ -508,28 +575,37 @@ module.exports.cron = {
                                     }
                                     if (!contratoup) {
                                     } else {
-                                      titulo = "Contrato pagado y finalizado";
-                                      descripcion =
-                                        "EL pago del contrato ha sido realizado satisfactoriamente " +
-                                        "\n" +
-                                        "con un valor de : " +
-                                        pago[0].monto +
-                                        " El contrato de Compraventa se da por finalizado";
-                                      hora = moment().format("HH:mm");
-                                      fecha = moment().format("YYYY-MM-DD");
-                                      Servicio.crearMensaje(
-                                        titulo,
-                                        descripcion,
-                                        element.id,
-                                        hora,
-                                        fecha
-                                      ).then(mensaje => {
-                                        console.log(mensaje);
-                                      });
+                                      message = {
+                                        titulo: "Contrato pagado y finalizado",
+                                        descripcion:
+                                          "EL pago del contrato ha sido realizado satisfactoriamente " +
+                                          "\n" +
+                                          "con un valor de : " +
+                                          pago[0].monto +
+                                          " El contrato de Compraventa se da por finalizado",
+                                        hora: moment().format("HH:mm"),
+                                        fecha: moment().format("YYYY-MM-DD"),
+                                        contrato: element.id
+                                      };
+                                      sails.request(
+                                        "POST http://localhost:1337/api/mensaje",
+                                        message,
+                                        function(err, response, body) {
+                                          if (err) {
+                                            sails.log.debug(err);
+                                          }
+                                          if (!body.success) {
+                                            sails.log.debug(
+                                              "error en el registro"
+                                            );
+                                          }
+                                        }
+                                      );
                                     }
                                   });
                                 }
                               });
+                              // si el ultimo pago se encuentra entre el penultima y ultima fecha de pago
                             } else if (
                               moment(ultimopago).isBetween(
                                 finmenosuno,
@@ -545,7 +621,6 @@ module.exports.cron = {
                                 diasParaPago * -1 <= 60
                               ) {
                                 //// se calcula sobre el valor de la cuota
-
                                 valorAnterior =
                                   (element.valor - element.pagado) /
                                   contratoetiqueta.cantidadPeriodo;
@@ -554,80 +629,122 @@ module.exports.cron = {
                                   (diasParaPago * -1);
 
                                 nuevoValorPago = valorAnterior + interes;
-
-                                titulo = "Se encuentra en mora el ultimo pago";
-                                descripcion =
-                                  "El pago" +
-                                  " está atrasado" +
-                                  diasParaPago +
-                                  "  días" +
-                                  " El valor a pagar era de " +
-                                  valorAnterior +
-                                  ". El nuevo valor a pagar con intereses es de " +
-                                  nuevoValorPago +
-                                  "PESOS";
-                                hora = moment().format("HH:mm");
-                                fecha = now;
-                                Servicio.crearMensaje(
-                                  titulo,
-                                  descripcion,
-                                  element.id,
-                                  hora,
-                                  fecha
-                                ).then(mensaje => {
-                                  console.log(mensaje);
-                                  Servicio.actualizarContratoEtiqueta(
-                                    element.id,
-                                    nuevoValorPago
-                                  ).then(retorno => {
-                                    console.log(retorno);
-                                  });
-                                });
+                                let message = {
+                                  titulo: "Se encuentra en mora el ultimo pago",
+                                  descripcion:
+                                    "El pago" +
+                                    " está atrasado" +
+                                    diasParaPago +
+                                    "  días" +
+                                    " El valor a pagar era de " +
+                                    valorAnterior +
+                                    ". El nuevo valor a pagar con intereses es de " +
+                                    nuevoValorPago +
+                                    "PESOS",
+                                  hora: moment().format("HH:mm"),
+                                  fecha: now
+                                };
+                                sails.request(
+                                  "POST http://localhost:1337/api/mensaje",
+                                  message,
+                                  function(err, response, body) {
+                                    if (err) {
+                                      sails.log.debug(err);
+                                    }
+                                    if (!body.success) {
+                                      sails.log.debug("error en el registro");
+                                    } else {
+                                      Servicio.actualizarContratoEtiqueta(
+                                        element.id,
+                                        nuevoValorPago
+                                      ).then(retorno => {
+                                        console.log(retorno);
+                                      });
+                                    }
+                                  }
+                                );
+                                //mora mayor a 60 dias
                               } else if (diasParaPago * -1 > 60) {
-                                titulo = "Mora mayor a dos meses";
-                                descripcion =
-                                  "El pago de la cuota" +
-                                  "esta atrasado" +
-                                  diasParaPago +
-                                  "  días. " +
-                                  "El caso fue enviado a jurídica";
-                                hora = moment().format("HH:mm");
-                                fecha = now;
-                                Servicio.crearMensaje(
-                                  titulo,
-                                  descripcion,
-                                  element.id,
-                                  hora,
-                                  fecha
-                                ).then(mensaje => {
-                                  console.log(mensaje);
-                                });
+                                let message = {
+                                  titulo: "Mora mayor a dos meses",
+                                  descripcion:
+                                    "El pago de la cuota" +
+                                    "esta atrasado" +
+                                    diasParaPago +
+                                    "  días. " +
+                                    "El caso fue enviado a jurídica",
+                                  hora: moment().format("HH:mm"),
+                                  fecha: now,
+                                  contrato: element.id
+                                };
+                                sails.request(
+                                  "POST http://localhost:1337/api/mensaje",
+                                  message,
+                                  function(err, response, body) {
+                                    if (err) {
+                                      sails.log.debug(err);
+                                    }
+                                    if (!body.success) {
+                                      sails.log.debug("error en el registro");
+                                    } else {
+                                      //enviar correo
+                                      let mailOptions = {
+                                        from: "nombreEmpresa@gmail.com",
+                                        to: "juridicaEmpresa@gmail.com",
+                                        subject: `Mora mayor a dos meses`,
+                                        text:
+                                          "El contrato " +
+                                          element.observaciones +
+                                          "ha sobrepasado el limite de mora"
+                                      };
+                                      transporter.sendMail(
+                                        mailOptions,
+                                        function(error, info) {
+                                          if (error) {
+                                            console.log(error);
+                                            throw error;
+                                          } else {
+                                            console.log(
+                                              "Email successfully sent!"
+                                            );
+                                            console.log(info);
+                                          }
+                                        }
+                                      );
+                                    }
+                                  }
+                                );
                               }
-                              //enviar correo
+                              //pago a realizar igual a la fecha actual
                             } else if (moment(proximopago).isSame(now)) {
                               console.log("hoy dia de pago");
-                              titulo = "Hoy, día de pago";
-                              descripcion =
-                                "Flatan 0 dias para el pago de la cuota";
-                              hora = moment().format("HH:mm");
-                              fecha = now;
-                              Servicio.crearMensaje(
-                                titulo,
-                                descripcion,
-                                element.id,
-                                hora,
-                                fecha
-                              ).then(mensaje => {
-                                console.log(mensaje);
-                              });
+                              let message = {
+                                titulo: "Hoy, día de pago",
+                                descripcion:
+                                  "Flatan 0 dias para el pago de la cuota",
+                                hora: moment().format("HH:mm"),
+                                fecha: now,
+                                contrato: element.id
+                              };
+                              sails.request(
+                                "POST http://localhost:1337/api/mensaje",
+                                message,
+                                function(err, response, body) {
+                                  if (err) {
+                                    sails.log.debug(err);
+                                  }
+                                  if (!body.success) {
+                                    sails.log.debug("error en el registro");
+                                  }
+                                }
+                              );
+                              //entra en mora
                             } else if (moment(now).isAfter(proximopago)) {
-                              console.log("entra por aca");
                               if (
                                 diasParaPago * -1 > 0 &&
                                 diasParaPago * -1 <= 60
                               ) {
                                 //// se calcula sobre el valor de la cuota
-
                                 valorAnterior =
                                   (element.valor - element.pagado) /
                                   contratoetiqueta.cantidadPeriodo;
@@ -636,97 +753,68 @@ module.exports.cron = {
                                   (diasParaPago * -1);
 
                                 nuevoValorPago = valorAnterior + interes;
-
-                                titulo = "Se encuentra en mora";
-                                descripcion =
-                                  "El pago" +
-                                  " está atrasado" +
-                                  diasParaPago +
-                                  "  días" +
-                                  " El valor a pagar era de " +
-                                  valorAnterior +
-                                  ". El nuevo valor a pagar con intereses es de " +
-                                  nuevoValorPago +
-                                  " PESOS";
-                                hora = moment().format("HH:mm");
-                                fecha = now;
-                                Servicio.crearMensaje(
-                                  titulo,
-                                  descripcion,
-                                  element.id,
-                                  hora,
-                                  fecha
-                                ).then(mensaje => {
-                                  console.log(mensaje);
-                                  Servicio.actualizarContratoEtiqueta(
-                                    element.id,
-                                    nuevoValorPago
-                                  ).then(retorno => {
-                                    console.log(retorno);
-                                  });
-                                });
-                              } else if (diasParaPago * -1 > 60) {
-                                titulo = "Mora mayor a dos meses";
-                                descripcion =
-                                  "El pago de la cuota" +
-                                  "esta atrasado" +
-                                  diasParaPago +
-                                  "  días. " +
-                                  "El caso fue enviado a jurídica";
-                                hora = moment().format("HH:mm");
-                                fecha = now;
-                                Servicio.crearMensaje(
-                                  titulo,
-                                  descripcion,
-                                  element.id,
-                                  hora,
-                                  fecha
-                                ).then(mensaje => {
-                                  console.log(mensaje);
-
-                                  //enviar email a juridica
-
-                                  let mailOptions = {
-                                    from: "nombreEmpresa@gmail.com",
-                                    to: "juridicaEmpresa@gmail.com",
-                                    subject: `Mora mayor a dos meses`,
-                                    text:
-                                      "El contrato " +
-                                      element.observaciones +
-                                      "ha sobrepasado el limite de mora"
-                                  };
-                                  transporter.sendMail(mailOptions, function(
-                                    error,
-                                    info
-                                  ) {
-                                    if (error) {
-                                      console.log(error);
-                                      throw error;
-                                    } else {
-                                      console.log("Email successfully sent!");
-                                      console.log(info);
+                                let message = {
+                                  titulo: "Se encuentra en mora",
+                                  descripcion:
+                                    "El pago" +
+                                    " está atrasado" +
+                                    diasParaPago +
+                                    "  días" +
+                                    " El valor a pagar era de " +
+                                    valorAnterior +
+                                    ". El nuevo valor a pagar con intereses es de " +
+                                    nuevoValorPago +
+                                    " PESOS",
+                                  hora: moment().format("HH:mm"),
+                                  fecha: now,
+                                  contrato: element.id
+                                };
+                                sails.request(
+                                  "POST http://localhost:1337/api/mensaje",
+                                  message,
+                                  function(err, response, body) {
+                                    if (err) {
+                                      sails.log.debug(err);
                                     }
-                                  });
-                                });
+                                    if (!body.success) {
+                                      sails.log.debug("error en el registro");
+                                    } else {
+                                      Servicio.actualizarContratoEtiqueta(
+                                        element.id,
+                                        nuevoValorPago
+                                      ).then(retorno => {
+                                        console.log(retorno);
+                                      });
+                                    }
+                                  }
+                                );
                               }
+                              // pago proximo a la fecha
                             } else if (diasParaPago > 0 && diasParaPago <= 3) {
-                              titulo =
-                                "Faltan pocos días para realizar el siguiente pago";
-                              descripcion =
-                                "EL contrato se debe pagar pronto, faltan " +
-                                diasParaPago +
-                                " días para el pago de la cuota";
-                              hora = moment().format("HH:mm");
-                              fecha = now;
-                              Servicio.crearMensaje(
-                                titulo,
-                                descripcion,
-                                element.id,
-                                hora,
-                                fecha
-                              ).then(mensaje => {
-                                console.log(mensaje);
-                              });
+                              let message = {
+                                titulo:
+                                  "Faltan pocos días para realizar el siguiente pago",
+                                descripcion:
+                                  "EL contrato se debe pagar pronto, faltan " +
+                                  diasParaPago +
+                                  " días para el pago de la cuota",
+                                hora: moment().format("HH:mm"),
+                                fecha: now,
+                                contrato: element.id
+                              };
+                              sails.request(
+                                "POST http://localhost:1337/api/mensaje",
+                                message,
+                                function(err, response, body) {
+                                  if (err) {
+                                    sails.log.debug(err);
+                                  }
+                                  if (!body.success) {
+                                    sails.log.debug("error en el registro");
+                                  }
+                                }
+                              );
+                              //pagado despues de la fecha limite
                             } else if (
                               sumadepagos >= element.valor &&
                               moment(fechafin).isAfter(ultimopago)
@@ -742,60 +830,75 @@ module.exports.cron = {
                                 if (!stade) {
                                   console.log("no estado");
                                 } else {
-                                  titulo = "Contrato pagado y finalizado";
-                                  descripcion =
-                                    "EL pago del contrato ha sido realizado satisfactoriamente " +
-                                    "con un valor de : " +
-                                    sumadepagos +
-                                    "<br>" +
-                                    "El contrato de Compraventa se da por finalizado";
-                                  hora = moment().format("HH:mm");
-                                  fecha = moment().format("YYYY-MM-DD");
-                                  Servicio.crearMensaje(
-                                    titulo,
-                                    descripcion,
-                                    element.id,
-                                    hora,
-                                    fecha
-                                  ).then(mensaje => {
-                                    console.log(mensaje);
-                                    Contrato.update(element.id, {
-                                      pagado: pago[0].monto,
-                                      cancelo: true,
-                                      estado: stade.id
-                                    }).exec((err, contratoup) => {
+                                  let message = {
+                                    titulo: "Contrato pagado y finalizado",
+                                    descripcion:
+                                      "EL pago del contrato ha sido realizado satisfactoriamente " +
+                                      "con un valor de : " +
+                                      sumadepagos +
+                                      "<br>" +
+                                      "El contrato de Compraventa se da por finalizado",
+                                    hora: moment().format("HH:mm"),
+                                    fecha: moment().format("YYYY-MM-DD"),
+                                    contrato: element.id
+                                  };
+                                  sails.request(
+                                    "POST http://localhost:1337/api/mensaje",
+                                    message,
+                                    function(err, response, body) {
                                       if (err) {
-                                        return res.serverError(err);
+                                        sails.log.debug(err);
                                       }
-                                      if (!contratoup) {
+                                      if (!body.success) {
+                                        sails.log.debug("error en el registro");
                                       } else {
-                                        console.log(contratoup);
+                                        Contrato.update(element.id, {
+                                          pagado: pago[0].monto,
+                                          cancelo: true,
+                                          estado: stade.id
+                                        }).exec((err, contratoup) => {
+                                          if (err) {
+                                            return res.serverError(err);
+                                          }
+                                          if (!contratoup) {
+                                          } else {
+                                            console.log(contratoup);
+                                          }
+                                        });
                                       }
-                                    });
-                                  });
+                                    }
+                                  );
                                 }
                               });
+                              //ultimo pago menor a la deuda
                             } else if (pago[0].monto < contratoetiqueta.valor) {
-                              titulo = "EL pago menor a la cuota";
-                              descripcion =
-                                "EL pago realizado es menor a la deuda " +
-                                "<br>" +
-                                "Pago : " +
-                                pago[0].monto +
-                                "<br>" +
-                                "Deuda : " +
-                                contratoetiqueta.valor;
-                              hora = moment().format("HH:mm");
-                              fecha = moment().format("YYYY-MM-DD");
-                              Servicio.crearMensaje(
-                                titulo,
-                                descripcion,
-                                element.id,
-                                hora,
-                                fecha
-                              ).then(mensaje => {
-                                console.log(mensaje);
-                              });
+                              let message = {
+                                titulo: "EL pago menor a la cuota",
+                                descripcion:
+                                  "EL pago realizado es menor a la deuda " +
+                                  "<br>" +
+                                  "Pago : " +
+                                  pago[0].monto +
+                                  "<br>" +
+                                  "Deuda : " +
+                                  contratoetiqueta.valor,
+                                hora: moment().format("HH:mm"),
+                                fecha: moment().format("YYYY-MM-DD"),
+                                contrato: element.id
+                              };
+                              sails.request(
+                                "POST http://localhost:1337/api/mensaje",
+                                message,
+                                function(err, response, body) {
+                                  if (err) {
+                                    sails.log.debug(err);
+                                  }
+                                  if (!body.success) {
+                                    sails.log.debug("error en el registro");
+                                  }
+                                }
+                              );
+                              //calcula nuevo valor del pago
                             } else if (
                               pago[0].monto == contratoetiqueta.valor
                             ) {
@@ -818,11 +921,14 @@ module.exports.cron = {
             });
           }
         });
+
       // sails.log('antes de moriri \n')
       // sails.log(sails.hooks.cron.jobs.myFirstJob)
       // sails.hooks.cron.jobs.myFirstJob.stop();
       // sails.log('despues de de moriri \n')
       // sails.log(sails.hooks.cron.jobs.myFirstJob)
-    }
+    },
+    start: true,
+    runOnInit: true
   }
 };
