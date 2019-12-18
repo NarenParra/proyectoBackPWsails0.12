@@ -205,6 +205,9 @@ module.exports = {
   },
 
   update: function(req, res) {
+    console.log("req.param(unidadPeriodo)")
+    console.log(req.param("unidadPeriodo"))
+
     Estado.findOne({
       slug: req.param("estado")
     })

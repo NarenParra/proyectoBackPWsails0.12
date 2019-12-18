@@ -55,5 +55,6 @@ module.exports = {
       .catch(function(err) {
         return res.serverError(err);
       });
-  }
+  },
+
 };

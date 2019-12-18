@@ -63,6 +63,6 @@ module.exports.routes = {
   'GET /api/articulo' :'ArticuloController.get',
   'GET /api/mensaje' :'MensajeController.get',
   'POST /api/mensaje' :'MensajeController.create',
-  'POST /api/pago' :'PagoController.create' 
+  'POST /api/pago' :'PagoController.create',
 
 };
