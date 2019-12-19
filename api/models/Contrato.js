@@ -14,7 +14,7 @@ module.exports = {
     observaciones: { // 
       type: "string"
     },
-    concelo:{
+    cancelo:{
       type:"boolean"
     },
     usuario: {

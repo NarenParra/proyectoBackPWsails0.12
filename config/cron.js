@@ -26,7 +26,9 @@ module.exports.cron = {
     schedule: "6  14 * * *",
     //schedule: '6 */55 * * * *',
     onTick: function() {
-      Contrato.find()
+      Contrato.find(
+       {cancelo:false}
+      )
         .populate("estado")
         .exec((err, contrato) => {
           if (err) {
@@ -68,6 +70,9 @@ module.exports.cron = {
                           ) {
                             console.log("entra if no pago 1");
                             var unidad = "";
+                            /*var unidad = {
+                              'Días': 'days'
+                            };*/
                             if (contratoetiqueta.unidadPeriodo == "Días") {
                               unidad = "days";
                             } else if (
